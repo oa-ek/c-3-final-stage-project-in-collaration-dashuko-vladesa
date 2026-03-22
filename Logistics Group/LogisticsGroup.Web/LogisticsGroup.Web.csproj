@@ -6,4 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LogisticsGroup.Application\LogisticsGroup.Application.csproj" />
+    <ProjectReference Include="..\LogisticsGroup.Infrastructure\LogisticsGroup.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
