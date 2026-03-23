@@ -5,65 +5,62 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LogisticsGroup.Web.Controllers
 {
-    public class CityController : Controller
+    public class BranchController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CityController(IUnitOfWork unitOfWork)
+        public BranchController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        
         public IActionResult Index()
         {
-            
+            var branchList = _unitOfWork.Branch.GetAll().ToList();
             var cityList = _unitOfWork.City.GetAll().ToList();
 
-           
-            var regionList = _unitOfWork.Region.GetAll().ToList();
-
             
-            foreach (var city in cityList)
+            foreach (var branch in branchList)
             {
-                city.Region = regionList.FirstOrDefault(r => r.Id == city.RegionId);
+                branch.City = cityList.FirstOrDefault(c => c.Id == branch.CityId);
             }
 
-            return View(cityList);
+            return View(branchList);
         }
 
         public IActionResult Create()
         {
-            IEnumerable<SelectListItem> regionList = _unitOfWork.Region.GetAll().Select(u => new SelectListItem
+            
+            IEnumerable<SelectListItem> cityList = _unitOfWork.City.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.RegionList = regionList;
+            ViewBag.CityList = cityList;
 
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(City obj)
+        public IActionResult Create(Branch obj)
         {
-            ModelState.Remove("Region");
-            ModelState.Remove("Branches");
+           
+            ModelState.Remove("City");
 
             if (ModelState.IsValid)
             {
-                _unitOfWork.City.Add(obj);
+                _unitOfWork.Branch.Add(obj);
                 _unitOfWork.Save();
                 return RedirectToAction("Index");
             }
 
-            IEnumerable<SelectListItem> regionList = _unitOfWork.Region.GetAll().Select(u => new SelectListItem
+            IEnumerable<SelectListItem> cityList = _unitOfWork.City.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.RegionList = regionList;
+            ViewBag.CityList = cityList;
 
             return View(obj);
         }
@@ -71,39 +68,38 @@ namespace LogisticsGroup.Web.Controllers
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0) return NotFound();
-            var cityFromDb = _unitOfWork.City.Get(u => u.Id == id);
-            if (cityFromDb == null) return NotFound();
+            var branchFromDb = _unitOfWork.Branch.Get(u => u.Id == id);
+            if (branchFromDb == null) return NotFound();
 
-            IEnumerable<SelectListItem> regionList = _unitOfWork.Region.GetAll().Select(u => new SelectListItem
+            IEnumerable<SelectListItem> cityList = _unitOfWork.City.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.RegionList = regionList;
+            ViewBag.CityList = cityList;
 
-            return View(cityFromDb);
+            return View(branchFromDb);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(City obj)
+        public IActionResult Edit(Branch obj)
         {
-            ModelState.Remove("Region");
-            ModelState.Remove("Branches");
+            ModelState.Remove("City");
 
             if (ModelState.IsValid)
             {
-                _unitOfWork.City.Update(obj);
+                _unitOfWork.Branch.Update(obj);
                 _unitOfWork.Save();
                 return RedirectToAction("Index");
             }
 
-            IEnumerable<SelectListItem> regionList = _unitOfWork.Region.GetAll().Select(u => new SelectListItem
+            IEnumerable<SelectListItem> cityList = _unitOfWork.City.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.RegionList = regionList;
+            ViewBag.CityList = cityList;
 
             return View(obj);
         }
@@ -111,22 +107,22 @@ namespace LogisticsGroup.Web.Controllers
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0) return NotFound();
-            var cityFromDb = _unitOfWork.City.Get(u => u.Id == id);
-            if (cityFromDb == null) return NotFound();
+            var branchFromDb = _unitOfWork.Branch.Get(u => u.Id == id);
+            if (branchFromDb == null) return NotFound();
 
-            
-            cityFromDb.Region = _unitOfWork.Region.Get(u => u.Id == cityFromDb.RegionId);
+           
+            branchFromDb.City = _unitOfWork.City.Get(u => u.Id == branchFromDb.CityId);
 
-            return View(cityFromDb);
+            return View(branchFromDb);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeletePOST(int? id)
         {
-            var obj = _unitOfWork.City.Get(u => u.Id == id);
+            var obj = _unitOfWork.Branch.Get(u => u.Id == id);
             if (obj == null) return NotFound();
-            _unitOfWork.City.Remove(obj);
+            _unitOfWork.Branch.Remove(obj);
             _unitOfWork.Save();
             return RedirectToAction("Index");
         }

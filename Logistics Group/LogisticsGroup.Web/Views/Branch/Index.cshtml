@@ -1,0 +1,57 @@
+﻿@model IEnumerable<LogisticsGroup.Domain.Entities.Branch>
+
+@{
+    ViewData["Title"] = "Відділення";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Список відділень</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Branch" asp-action="Create" class="btn btn-primary">
+                Додати нове відділення
+            </a>
+        </div>
+    </div>
+    <br /><br />
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Місто</th>
+                <th>Адреса</th>
+                <th>Тип</th>
+                <th>До (кг)</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var obj in Model)
+                {
+                    <tr>
+                        <td width="10%">@obj.Number</td>
+                        <td width="20%">@(obj.City != null ? obj.City.Name : "Не вказано")</td>
+                        <td width="25%">@obj.Address</td>
+                        <td width="15%">@obj.Type</td>
+                        <td width="10%">@(obj.MaxWeight.HasValue? obj.MaxWeight.ToString() : "Без ліміту")</td>
+                        <td class="text-center">
+                            <div class="w-75 btn-group" role="group">
+                                <a asp-controller="Branch" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">Редаг.</a>
+                                <a asp-controller="Branch" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">Видал.</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" class="text-center">Відділень поки що немає.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

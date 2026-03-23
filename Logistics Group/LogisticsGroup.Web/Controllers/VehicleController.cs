@@ -13,16 +13,15 @@ namespace LogisticsGroup.Web.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        // Логіст дивиться список усіх машин
+        
         public IActionResult Index()
         {
-            // УВАГА: Якщо Дарина назвала репозиторій у множині (Vehicles), 
-            // просто допишіть літеру 's' у словах _unitOfWork.Vehicle
+            
             var vehicleList = _unitOfWork.Vehicle.GetAll();
             return View(vehicleList);
         }
 
-        // Логіст додає нову машину
+        
         public IActionResult Create()
         {
             return View();
@@ -41,7 +40,7 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        // Логіст редагує дані машини
+        
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0) return NotFound();
@@ -63,7 +62,7 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        // Логіст списує/видаляє машину
+       
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0) return NotFound();

@@ -10,10 +10,10 @@
         <hr />
     </div>
 
-    @* Форма, яка буде відправляти дані в метод POST Create нашого контролера *@
+   
     <form method="post" asp-action="Create">
         <div class="border p-3 mt-4">
-            @* Блок для показу загальних помилок *@
+            
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
@@ -28,7 +28,7 @@
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
 
-            @* 💡 УВАГА: Якщо Дарина в моделі Driver створила ще якісь поля (наприклад, LicenseCategory - категорія прав, або Experience - досвід), просто скопіюйте блок вище і змініть слово Phone на назву нового поля *@
+          
 
             <div class="mt-4">
                 <button type="submit" class="btn btn-primary" style="width:150px">Зберегти</button>
@@ -40,7 +40,7 @@
     </form>
 </div>
 
-@* Підключаємо скрипти для перевірки правильності введених даних (щоб не перезавантажувати сторінку) *@
+
 @section Scripts {
     @{
         <partial name="_ValidationScriptsPartial" />

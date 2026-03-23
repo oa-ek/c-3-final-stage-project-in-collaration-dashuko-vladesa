@@ -13,14 +13,14 @@ namespace LogisticsGroup.Web.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        // Логіст дивиться список категорій
+       
         public IActionResult Index()
         {
             var categoryList = _unitOfWork.CargoCategory.GetAll();
             return View(categoryList);
         }
 
-        // Логіст створює нову категорію
+        
         public IActionResult Create()
         {
             return View();
@@ -39,7 +39,7 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        // Логіст редагує категорію
+        
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0) return NotFound();
@@ -61,7 +61,7 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        // Логіст видаляє категорію
+       
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0) return NotFound();

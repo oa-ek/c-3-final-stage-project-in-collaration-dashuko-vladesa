@@ -20,14 +20,14 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Type" class="form-label">Тип (напр. Місто, СМТ, Село)</label>
+                <label asp-for="Type" class="form-label">Тип </label>
                 <input asp-for="Type" class="form-control" />
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="RegionId" class="form-label">Область</label>
-                @* Ось наш красивий випадний список *@
+               
                 <select asp-for="RegionId" asp-items="@ViewBag.RegionList" class="form-select">
                     <option disabled selected>-- Виберіть область --</option>
                 </select>

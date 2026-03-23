@@ -21,36 +21,22 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        
-                        @* Кнопка "Водії" *@
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Driver" asp-action="Index">Водії</a>
                         </li>
-
-                        @* Кнопка "Транспорт" *@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Vehicle" asp-action="Index">Транспорт</a>
                         </li>
-
-                        @* Кнопка "Категорії вантажів" *@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="CargoCategory" asp-action="Index">Категорії вантажів</a>
                         </li>
-
-                        @* Кнопка "Області" *@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Region" asp-action="Index">Області</a>
                         </li>
-
-                        @* ОСЬ ТУТ ДОДАНО НОВУ КНОПКУ "МІСТА" *@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="City" asp-action="Index">Міста</a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
                         </li>
                     </ul>
                 </div>
@@ -65,7 +51,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - LogisticsGroup.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - LogisticsGroup.Web
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

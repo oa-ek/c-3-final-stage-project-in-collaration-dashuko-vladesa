@@ -1,0 +1,60 @@
+﻿@model LogisticsGroup.Domain.Entities.Branch
+
+@{
+    ViewData["Title"] = "Додати відділення";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <h2 class="text-primary">Створити нове відділення</h2>
+        <hr />
+    </div>
+
+    <form method="post" asp-action="Create">
+        <div class="border p-3 mt-4">
+            
+            <div class="mb-3">
+                <label asp-for="CityId" class="form-label">Місто</label>
+                <select asp-for="CityId" asp-items="@ViewBag.CityList" class="form-select">
+                    <option disabled selected>-- Виберіть місто --</option>
+                </select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Number" class="form-label">Номер відділення </label>
+                <input asp-for="Number" class="form-control" />
+                <span asp-validation-for="Number" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label">Адреса</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label">Тип </label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="WorkingHours" class="form-label">Години роботи (необов'язково)</label>
+                <input asp-for="WorkingHours" class="form-control" placeholder="09:00 - 18:00" />
+                <span asp-validation-for="WorkingHours" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MaxWeight" class="form-label">Максимальна вага в кг (необов'язково)</label>
+                <input asp-for="MaxWeight" type="number" step="0.1" class="form-control" />
+                <span asp-validation-for="MaxWeight" class="text-danger"></span>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary" style="width:150px">Зберегти</button>
+                <a asp-controller="Branch" asp-action="Index" class="btn btn-secondary" style="width:150px">Скасувати</a>
+            </div>
+        </div>
+    </form>
+</div>

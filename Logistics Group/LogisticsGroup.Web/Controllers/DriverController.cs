@@ -13,14 +13,14 @@ namespace LogisticsGroup.Web.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        // Логіст дивиться список усіх водіїв компанії
+       
         public IActionResult Index()
         {
             var driversList = _unitOfWork.Driver.GetAll();
             return View(driversList);
         }
 
-        // Логіст наймає нового водія
+       
         public IActionResult Create()
         {
             return View();
@@ -39,7 +39,7 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        // Логіст змінює дані водія (наприклад, номер телефону)
+        
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0) return NotFound();
@@ -61,7 +61,7 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        // Логіст звільняє водія
+        
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0) return NotFound();
