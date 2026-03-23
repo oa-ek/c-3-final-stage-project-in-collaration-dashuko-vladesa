@@ -1,0 +1,48 @@
+﻿@model LogisticsGroup.Domain.Entities.Driver
+
+@{
+    ViewData["Title"] = "Додати водія";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <h2 class="text-primary">Додати нового водія</h2>
+        <hr />
+    </div>
+
+    @* Форма, яка буде відправляти дані в метод POST Create нашого контролера *@
+    <form method="post" asp-action="Create">
+        <div class="border p-3 mt-4">
+            @* Блок для показу загальних помилок *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label">Ім'я водія (ПІБ)</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label">Номер телефону</label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
+            @* 💡 УВАГА: Якщо Дарина в моделі Driver створила ще якісь поля (наприклад, LicenseCategory - категорія прав, або Experience - досвід), просто скопіюйте блок вище і змініть слово Phone на назву нового поля *@
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary" style="width:150px">Зберегти</button>
+                <a asp-controller="Driver" asp-action="Index" class="btn btn-secondary" style="width:150px">
+                    Скасувати
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@* Підключаємо скрипти для перевірки правильності введених даних (щоб не перезавантажувати сторінку) *@
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

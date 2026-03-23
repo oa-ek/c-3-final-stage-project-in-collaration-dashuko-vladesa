@@ -1,0 +1,39 @@
+﻿@model LogisticsGroup.Domain.Entities.Driver
+
+@{
+    ViewData["Title"] = "Видалити водія";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <h2 class="text-danger">Видалити водія</h2>
+        <hr />
+    </div>
+
+    <h3 class="text-center">Ви впевнені, що хочете звільнити цього водія?</h3>
+
+    <div class="border p-3 mt-4">
+        @* Поля робимо disabled (неактивними), щоб перед видаленням Логіст просто перевірив дані, але не міг їх змінити *@
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label">Ім'я водія (ПІБ)</label>
+            <input asp-for="FullName" disabled class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Phone" class="form-label">Номер телефону</label>
+            <input asp-for="Phone" disabled class="form-control" />
+        </div>
+
+        <form method="post" asp-action="Delete">
+            @* Передаємо ID водія, якого треба видалити *@
+            <input type="hidden" asp-for="Id" />
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-danger" style="width:150px">Так, видалити</button>
+                <a asp-controller="Driver" asp-action="Index" class="btn btn-secondary" style="width:150px">
+                    Ні, скасувати
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

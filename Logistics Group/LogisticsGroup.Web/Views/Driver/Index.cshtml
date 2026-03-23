@@ -1,0 +1,58 @@
+﻿@model IEnumerable<LogisticsGroup.Domain.Entities.Driver>
+
+@{
+    ViewData["Title"] = "Керування Водіями";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Список Водіїв</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Driver" asp-action="Create" class="btn btn-primary">
+                Створити нового водія
+            </a>
+        </div>
+    </div>
+    <br /><br />
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Ім'я водія</th>
+                <th>Телефон / Дані</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var obj in Model)
+                {
+                    <tr>
+                        @* УВАГА: Якщо Дарина назвала поле імені інакше (наприклад, FirstName), змініть obj.Name на obj.FirstName *@
+                        <td width="40%">@obj.FullName</td>
+                        <td width="30%">@obj.Phone</td>
+                        <td class="text-center">
+                            <div class="w-75 btn-group" role="group">
+                                <a asp-controller="Driver" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">
+                                    Редагувати
+                                </a>
+                                <a asp-controller="Driver" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
+                                    Видалити
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">Водіїв поки що немає.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
