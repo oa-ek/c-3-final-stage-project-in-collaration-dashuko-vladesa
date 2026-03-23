@@ -1,0 +1,41 @@
+﻿@model LogisticsGroup.Domain.Entities.City
+
+@{
+    ViewData["Title"] = "Редагувати місто";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <h2 class="text-primary">Редагувати місто</h2>
+        <hr />
+    </div>
+
+    <form method="post" asp-action="Edit">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="border p-3 mt-4">
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Назва населеного пункту</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label">Тип</label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RegionId" class="form-label">Область</label>
+                <select asp-for="RegionId" asp-items="@ViewBag.RegionList" class="form-select"></select>
+                <span asp-validation-for="RegionId" class="text-danger"></span>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success" style="width:150px">Оновити</button>
+                <a asp-controller="City" asp-action="Index" class="btn btn-secondary" style="width:150px">Скасувати</a>
+            </div>
+        </div>
+    </form>
+</div>

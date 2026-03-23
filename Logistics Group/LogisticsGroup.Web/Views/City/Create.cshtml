@@ -1,0 +1,43 @@
+﻿@model LogisticsGroup.Domain.Entities.City
+
+@{
+    ViewData["Title"] = "Додати місто";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <h2 class="text-primary">Створити нове місто</h2>
+        <hr />
+    </div>
+
+    <form method="post" asp-action="Create">
+        <div class="border p-3 mt-4">
+            
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Назва населеного пункту</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label">Тип (напр. Місто, СМТ, Село)</label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RegionId" class="form-label">Область</label>
+                @* Ось наш красивий випадний список *@
+                <select asp-for="RegionId" asp-items="@ViewBag.RegionList" class="form-select">
+                    <option disabled selected>-- Виберіть область --</option>
+                </select>
+                <span asp-validation-for="RegionId" class="text-danger"></span>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary" style="width:150px">Зберегти</button>
+                <a asp-controller="City" asp-action="Index" class="btn btn-secondary" style="width:150px">Скасувати</a>
+            </div>
+        </div>
+    </form>
+</div>

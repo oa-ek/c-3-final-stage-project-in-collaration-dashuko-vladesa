@@ -1,0 +1,33 @@
+﻿@model LogisticsGroup.Domain.Entities.City
+
+@{
+    ViewData["Title"] = "Видалити місто";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <h2 class="text-danger">Видалити місто</h2>
+        <hr />
+    </div>
+
+    <h3 class="text-center">Ви впевнені, що хочете видалити це місто?</h3>
+
+    <div class="border p-3 mt-4">
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Назва</label>
+            <input asp-for="Name" disabled class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Type" class="form-label">Тип</label>
+            <input asp-for="Type" disabled class="form-control" />
+        </div>
+
+        <form method="post" asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <div class="mt-4">
+                <button type="submit" class="btn btn-danger" style="width:150px">Так, видалити</button>
+                <a asp-controller="City" asp-action="Index" class="btn btn-secondary" style="width:150px">Ні, скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
