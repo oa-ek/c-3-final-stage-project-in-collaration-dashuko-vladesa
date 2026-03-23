@@ -1,0 +1,39 @@
+﻿@model LogisticsGroup.Domain.Entities.Vehicle
+
+@{
+    ViewData["Title"] = "Видалити машину";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <h2 class="text-danger">Видалити машину</h2>
+        <hr />
+    </div>
+
+    <h3 class="text-center">Ви впевнені, що хочете списати цю машину?</h3>
+
+    <div class="border p-3 mt-4">
+        
+        <div class="mb-3">
+            <label asp-for="Brand" class="form-label">Марка авто</label>
+            <input asp-for="Brand" disabled class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="LicensePlate" class="form-label">Номерний знак</label>
+            <input asp-for="LicensePlate" disabled class="form-control" />
+        </div>
+
+        <form method="post" asp-action="Delete">
+            @* Передаємо ID машини, яку треба видалити *@
+            <input type="hidden" asp-for="Id" />
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-danger" style="width:150px">Так, видалити</button>
+                <a asp-controller="Vehicle" asp-action="Index" class="btn btn-secondary" style="width:150px">
+                    Ні, скасувати
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

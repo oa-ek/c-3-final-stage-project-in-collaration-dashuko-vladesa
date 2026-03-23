@@ -1,0 +1,61 @@
+﻿@model IEnumerable<LogisticsGroup.Domain.Entities.Vehicle>
+
+@{
+    ViewData["Title"] = "Керування Транспортом";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Список Транспорту</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Vehicle" asp-action="Create" class="btn btn-primary">
+                Додати нову машину
+            </a>
+        </div>
+    </div>
+    <br /><br />
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Марка</th>
+                <th>Номерний знак</th>
+                <th>Вантажопідйомність</th>
+                <th>Статус</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var obj in Model)
+                {
+                    <tr>
+                        <td width="25%">@obj.Brand</td>
+                        <td width="20%">@obj.LicensePlate</td>
+                        <td width="20%">@obj.Capacity т.</td>
+                        <td width="15%">@obj.Status</td>
+                        <td class="text-center">
+                            <div class="w-75 btn-group" role="group">
+                                <a asp-controller="Vehicle" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">
+                                    Редагувати
+                                </a>
+                                <a asp-controller="Vehicle" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
+                                    Видалити
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center">Машин поки що немає.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
