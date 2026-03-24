@@ -24,7 +24,7 @@
                 <th>Номерний знак</th>
                 <th>Вантажопідйомність</th>
                 <th>Статус</th>
-                <th>Дії</th>
+                <th class="text-center">Дії</th>
             </tr>
         </thead>
         <tbody>
@@ -37,12 +37,14 @@
                         <td width="20%">@obj.LicensePlate</td>
                         <td width="20%">@obj.Capacity т.</td>
                         <td width="15%">@obj.Status</td>
-                        <td class="text-center">
-                            <div class="w-75 btn-group" role="group">
-                                <a asp-controller="Vehicle" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">
+                        
+                       
+                        <td width="20%" class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a asp-controller="Vehicle" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning">
                                     Редагувати
                                 </a>
-                                <a asp-controller="Vehicle" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
+                                <a asp-controller="Vehicle" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger">
                                     Видалити
                                 </a>
                             </div>
