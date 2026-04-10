@@ -15,7 +15,6 @@ namespace LogisticsGroup.Infrastructure.Repositories
 
             if (objFromDb is not null)
             {
-                // Оновлюємо саме твої поля
                 objFromDb.FullName = entity.FullName;
                 objFromDb.Phone = entity.Phone;
                 objFromDb.LicenseNumber = entity.LicenseNumber;

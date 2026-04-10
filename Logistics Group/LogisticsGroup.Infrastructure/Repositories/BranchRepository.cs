@@ -15,7 +15,6 @@ namespace LogisticsGroup.Infrastructure.Repositories
 
             if (objFromDb is not null)
             {
-                // Оновлюємо реальні поля твоєї моделі
                 objFromDb.Number = entity.Number;
                 objFromDb.Address = entity.Address;
                 objFromDb.Type = entity.Type;
