@@ -1,5 +1,7 @@
 using LogisticsGroup.Infrastructure.Data;
+using LogisticsGroup.Web.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +27,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<LogisticsGroup.Domain.Interfaces.IUnitOfWork, LogisticsGroup.Infrastructure.Repositories.UnitOfWork>();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); 
+builder.Services.AddRazorPages();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 

@@ -2,9 +2,11 @@
 using LogisticsGroup.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LogisticsGroup.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BranchController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
