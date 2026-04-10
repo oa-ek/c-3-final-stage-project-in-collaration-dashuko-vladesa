@@ -1,10 +1,12 @@
 ﻿using LogisticsGroup.Domain.Entities;
 using LogisticsGroup.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LogisticsGroup.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CityController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

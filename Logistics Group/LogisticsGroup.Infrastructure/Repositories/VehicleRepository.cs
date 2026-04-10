@@ -15,7 +15,6 @@ namespace LogisticsGroup.Infrastructure.Repositories
 
             if (objFromDb is not null)
             {
-                // Оновлюємо саме твої поля
                 objFromDb.LicensePlate = entity.LicensePlate;
                 objFromDb.Brand = entity.Brand;
                 objFromDb.Capacity = entity.Capacity;

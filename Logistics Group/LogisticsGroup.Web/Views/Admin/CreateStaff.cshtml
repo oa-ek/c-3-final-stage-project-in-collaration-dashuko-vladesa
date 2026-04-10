@@ -1,0 +1,59 @@
+﻿@model LogisticsGroup.Web.Models.RegisterStaffViewModel
+
+@{
+    ViewData["Title"] = "Реєстрація персоналу";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Створити акаунт співробітника</h4>
+            </div>
+            <div class="card-body">
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                }
+
+                <form asp-controller="Admin" asp-action="CreateStaff" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-bold"></label>
+                        <input asp-for="Email" class="form-control" placeholder="staff@novaposhta.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-bold"></label>
+                        <input asp-for="Password" class="form-control" placeholder="Мінімум 6 символів, 1 цифра" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Role" class="form-label fw-bold"></label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="">-- Оберіть посаду --</option>
+                            <option value="Logistician">Логіст</option>
+                            <option value="Driver">Водій</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100">Зареєструвати співробітника</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

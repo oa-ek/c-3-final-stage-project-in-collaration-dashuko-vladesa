@@ -15,7 +15,6 @@ namespace LogisticsGroup.Infrastructure.Repositories
 
             if (objFromDb is not null)
             {
-                // Оновлюємо реальні поля твоєї моделі
                 objFromDb.Name = entity.Name;
                 objFromDb.Type = entity.Type;
                 objFromDb.RegionId = entity.RegionId;

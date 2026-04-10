@@ -1,9 +1,11 @@
 ﻿using LogisticsGroup.Domain.Entities;
 using LogisticsGroup.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsGroup.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class VehicleController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
