@@ -45,22 +45,24 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
                                 </li>
-                                    <li class="nav-item">
-        <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Admin" asp-action="CreateStaff">+ Персонал</a>
-    </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Admin" asp-action="CreateStaff">+ Персонал</a>
+                                </li>
                         }
 
-                        @* Заглушки для майбутніх кабінетів *@
+                        @* Кабінет Логіста *@
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Logistician"))
                         {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" href="#">Кабінет Логіста</a>
+                                    <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Logistician" asp-action="Index">📦 Панель Логіста</a>
                                 </li>
                         }
+
+                        @* Кабінет Водія *@
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Driver"))
                         {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" href="#">Мої Рейси</a>
+                                    <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="DriverCabinet" asp-action="Index">🚚 Мої Рейси</a>
                                 </li>
                         }
                     </ul>

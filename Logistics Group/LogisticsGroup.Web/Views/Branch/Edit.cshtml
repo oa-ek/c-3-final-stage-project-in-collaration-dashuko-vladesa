@@ -1,18 +1,21 @@
 ﻿@model LogisticsGroup.Domain.Entities.Branch
 
 @{
-    ViewData["Title"] = "Додати відділення";
+    ViewData["Title"] = "Редагувати відділення";
 }
 
 <div class="container p-3">
     <div class="row pt-4">
-        <h2 class="text-primary">Створити нове відділення</h2>
+        <h2 class="text-primary">Редагувати відділення</h2>
         <hr />
     </div>
 
-    <form method="post" asp-action="Create">
+    <form method="post" asp-action="Edit">
+
+        <input type="hidden" asp-for="Id" />
+
         <div class="border p-3 mt-4">
-            
+
             <div class="mb-3">
                 <label asp-for="CityId" class="form-label">Місто</label>
                 <select asp-for="CityId" asp-items="@ViewBag.CityList" class="form-select">
