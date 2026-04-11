@@ -1,4 +1,4 @@
-﻿<<<<<<< HEAD
+﻿
 ﻿using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsGroup.Web.Controllers
@@ -9,11 +9,13 @@ namespace LogisticsGroup.Web.Controllers
         {
             return View();
         }
-=======
-﻿namespace LogisticsGroup.Web.Controllers
-{
-    public class LogisticianController
+    }
+
+    namespace LogisticsGroup.Web.Controllers
     {
->>>>>>> main
+        public class LogisticianController
+        {
+
+        }
     }
 }
