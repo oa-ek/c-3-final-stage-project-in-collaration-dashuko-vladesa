@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsGroup.Web.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -60,7 +61,6 @@ namespace LogisticsGroup.Web.Controllers
 
         // GET: /Account/ForgotPassword
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
             return View();
@@ -68,7 +68,6 @@ namespace LogisticsGroup.Web.Controllers
 
         // POST: /Account/ForgotPassword
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
         {
@@ -93,13 +92,12 @@ namespace LogisticsGroup.Web.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation()
         {
             return View();
         }
+
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult ResetPassword(string? code = null)
         {
             if (code == null)
@@ -114,7 +112,6 @@ namespace LogisticsGroup.Web.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
@@ -123,7 +120,7 @@ namespace LogisticsGroup.Web.Controllers
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return RedirectToAction("ResetPasswordConfirmation"); // Для безпеки не кажемо, що юзера нема
+                return RedirectToAction("ResetPasswordConfirmation"); 
 
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
@@ -139,7 +136,6 @@ namespace LogisticsGroup.Web.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult ResetPasswordConfirmation()
         {
             return View();

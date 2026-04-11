@@ -5,7 +5,7 @@
 }
 
 <div class="container p-3">
-    <div class="row pt-4">
+    <div class="row pt-4 mb-3">
         <div class="col-6">
             <h2 class="text-primary">Список Водіїв</h2>
         </div>
@@ -15,7 +15,20 @@
             </a>
         </div>
     </div>
-    <br /><br />
+
+    <div class="row mb-4 p-3 border rounded bg-light align-items-center">
+        <div class="col-md-7">
+            <form asp-controller="Driver" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data" class="d-flex">
+                <input type="file" name="file" class="form-control me-2" accept=".xlsx" required />
+                <button type="submit" class="btn btn-success text-nowrap">📥 Імпорт з Excel</button>
+            </form>
+        </div>
+        <div class="col-md-5 text-end">
+            <a asp-controller="Driver" asp-action="ExportToExcel" class="btn btn-outline-success">
+                📤 Експорт в Excel
+            </a>
+        </div>
+    </div>
 
     <table class="table table-bordered table-striped" style="width:100%">
         <thead>
@@ -30,28 +43,27 @@
             {
                 @foreach (var obj in Model)
                 {
-                    <tr>
-                      
-                        <td width="40%">@obj.FullName</td>
-                        <td width="30%">@obj.Phone</td>
-                        <td class="text-center">
-                            <div class="w-75 btn-group" role="group">
-                                <a asp-controller="Driver" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">
-                                    Редагувати
-                                </a>
-                                <a asp-controller="Driver" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
-                                    Видалити
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+                            <tr>
+                                <td width="40%">@obj.FullName</td>
+                                <td width="30%">@obj.Phone</td>
+                                <td class="text-center">
+                                    <div class="w-75 btn-group" role="group">
+                                        <a asp-controller="Driver" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">
+                                            Редагувати
+                                        </a>
+                                        <a asp-controller="Driver" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
+                                            Видалити
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                 }
             }
             else
             {
-                <tr>
-                    <td colspan="3" class="text-center">Водіїв поки що немає.</td>
-                </tr>
+                    <tr>
+                        <td colspan="3" class="text-center">Водіїв поки що немає.</td>
+                    </tr>
             }
         </tbody>
     </table>

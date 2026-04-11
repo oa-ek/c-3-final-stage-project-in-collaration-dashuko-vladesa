@@ -17,6 +17,18 @@
     </div>
     <br /><br />
 
+    <div class="row mb-4 p-3 border rounded bg-light align-items-center">
+        <div class="col-md-7">
+            <form asp-controller="Branch" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data" class="d-flex">
+                <input type="file" name="file" class="form-control me-2" accept=".xlsx" required />
+                <button type="submit" class="btn btn-success text-nowrap">📥 Імпорт з Excel</button>
+            </form>
+        </div>
+        <div class="col-md-5 text-end">
+            <a asp-controller="Branch" asp-action="ExportToExcel" class="btn btn-outline-success">📤 Експорт в Excel</a>
+        </div>
+    </div>
+
     <table class="table table-bordered table-striped" style="width:100%">
         <thead>
             <tr>
