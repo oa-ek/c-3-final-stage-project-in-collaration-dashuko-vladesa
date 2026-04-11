@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,3 +14,11 @@ namespace LogisticsGroup.Web.Controllers
         }
     }
 }
+=======
+﻿namespace LogisticsGroup.Web.Controllers
+{
+    public class DriverCabinetController
+    {
+    }
+}
+>>>>>>> main

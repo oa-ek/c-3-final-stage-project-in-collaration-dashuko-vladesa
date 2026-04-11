@@ -62,4 +62,56 @@
             </div>
         </div>
     </div>
+<<<<<<< HEAD
+=======
+    <br /><br />
+
+    <div class="row mb-4 p-3 border rounded bg-light align-items-center">
+        <div class="col-md-7">
+            <form asp-controller="Region" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data" class="d-flex">
+                <input type="file" name="file" class="form-control me-2" accept=".xlsx" required />
+                <button type="submit" class="btn btn-success text-nowrap">📥 Імпорт з Excel</button>
+            </form>
+        </div>
+        <div class="col-md-5 text-end">
+            <a asp-controller="Region" asp-action="ExportToExcel" class="btn btn-outline-success">📤 Експорт в Excel</a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Назва області</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var obj in Model)
+                {
+                    <tr>
+                        <td width="70%">@obj.Name</td>
+                        <td class="text-center">
+                            <div class="w-75 btn-group" role="group">
+                                <a asp-controller="Region" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">
+                                    Редагувати
+                                </a>
+                                <a asp-controller="Region" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
+                                    Видалити
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center">Областей поки що немає.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+>>>>>>> main
 </div>

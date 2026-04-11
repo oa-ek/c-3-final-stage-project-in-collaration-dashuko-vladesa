@@ -78,4 +78,58 @@
             </div>
         </div>
     </div>
+<<<<<<< HEAD
+=======
+    <br /><br />
+
+    <div class="row mb-4 p-3 border rounded bg-light align-items-center">
+        <div class="col-md-7">
+            <form asp-controller="Branch" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data" class="d-flex">
+                <input type="file" name="file" class="form-control me-2" accept=".xlsx" required />
+                <button type="submit" class="btn btn-success text-nowrap">📥 Імпорт з Excel</button>
+            </form>
+        </div>
+        <div class="col-md-5 text-end">
+            <a asp-controller="Branch" asp-action="ExportToExcel" class="btn btn-outline-success">📤 Експорт в Excel</a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Місто</th>
+                <th>Адреса</th>
+                <th>Тип</th>
+                <th>До (кг)</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var obj in Model)
+                {
+                    <tr>
+                        <td width="10%">@obj.Number</td>
+                        <td width="20%">@(obj.City != null ? obj.City.Name : "Не вказано")</td>
+                        <td width="25%">@obj.Address</td>
+                        <td width="15%">@obj.Type</td>
+                        <td width="10%">@(obj.MaxWeight.HasValue? obj.MaxWeight.ToString() : "Без ліміту")</td>
+                        <td class="text-center">
+                            <div class="w-75 btn-group" role="group">
+                                <a asp-controller="Branch" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning mx-2">Редаг.</a>
+                                <a asp-controller="Branch" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">Видал.</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" class="text-center">Відділень поки що немає.</td></tr>
+            }
+        </tbody>
+    </table>
+>>>>>>> main
 </div>

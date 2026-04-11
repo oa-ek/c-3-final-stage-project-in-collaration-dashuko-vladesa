@@ -2,6 +2,8 @@ using LogisticsGroup.Infrastructure.Data;
 using LogisticsGroup.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +28,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<LogisticsGroup.Domain.Interfaces.IUnitOfWork, LogisticsGroup.Infrastructure.Repositories.UnitOfWork>();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
+
 builder.Services.AddRazorPages();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
@@ -41,8 +50,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseStaticFiles(); // Для CSS/JS файлів
-app.MapStaticAssets(); 
+app.UseStaticFiles();
+app.MapStaticAssets();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -52,14 +61,14 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-app.MapRazorPages(); // Маршрути для Identity
+app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        DbSeeder.SeedRolesAndAdminAsync(services).Wait();
+        await DbSeeder.SeedRolesAndAdminAsync(services);
     }
     catch (Exception ex)
     {
