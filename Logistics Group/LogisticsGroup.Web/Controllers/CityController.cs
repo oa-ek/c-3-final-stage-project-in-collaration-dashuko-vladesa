@@ -43,11 +43,12 @@ namespace LogisticsGroup.Web.Controllers
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.RegionList = regionList;
+
+            
+            ViewBag.RegionId = regionList;
 
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(City obj)
@@ -75,6 +76,7 @@ namespace LogisticsGroup.Web.Controllers
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0) return NotFound();
+
             var cityFromDb = _unitOfWork.City.Get(u => u.Id == id);
             if (cityFromDb == null) return NotFound();
 
@@ -83,7 +85,9 @@ namespace LogisticsGroup.Web.Controllers
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.RegionList = regionList;
+
+            
+            ViewBag.RegionId = regionList;
 
             return View(cityFromDb);
         }

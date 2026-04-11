@@ -1,6 +1,155 @@
+<<<<<<< HEAD
+﻿@{
+    ViewData["Title"] = "Панель управління";
+    var logisticianName = User.Identity?.Name ?? "Логіст";
+}
+
+<div class="container-fluid mt-4 mb-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0" style="color: #ed3237;">
+                <i class="bi bi-speedometer2 me-2"></i> Центр управління логістикою
+            </h2>
+            <p class="text-muted mt-1 mb-0">З поверненням, @logisticianName! Ось короткий звіт на сьогодні.</p>
+        </div>
+        <a href="#" class="btn text-white fw-bold shadow-sm px-4 py-2" style="background-color: #ed3237; border-radius: 12px;">
+            <i class="bi bi-plus-lg me-2"></i> Створити новий рейс
+        </a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%); color: white;">
+                <div class="card-body p-4 position-relative overflow-hidden">
+                    <i class="bi bi-truck position-absolute opacity-25" style="font-size: 6rem; right: -10px; bottom: -20px;"></i>
+                    <h6 class="fw-bold text-uppercase mb-2">В дорозі</h6>
+                    <h2 class="fw-bolder display-5 mb-0">12</h2>
+                    <p class="mb-0 mt-2 small opacity-75"><i class="bi bi-arrow-up-right me-1"></i> +2 з учорашнього дня</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="text-muted fw-bold text-uppercase mb-0">Вільні водії</h6>
+                        <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-person-check-fill text-primary fs-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bolder text-dark mb-0">5</h2>
+                    <p class="text-success mb-0 mt-2 small fw-bold"><i class="bi bi-check-circle me-1"></i> Готові до відправки</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="text-muted fw-bold text-uppercase mb-0">На складах</h6>
+                        <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-boxes text-warning fs-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bolder text-dark mb-0">24</h2>
+                    <p class="text-warning mb-0 mt-2 small fw-bold"><i class="bi bi-clock-history me-1"></i> Потребують розподілу</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="text-muted fw-bold text-uppercase mb-0">На СТО</h6>
+                        <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-tools text-danger fs-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bolder text-dark mb-0">2</h2>
+                    <p class="text-danger mb-0 mt-2 small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i> Тимчасово недоступні</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-activity text-danger me-2"></i> Моніторинг активних рейсів</h5>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill fw-bold"><i class="bi bi-arrow-clockwise"></i> Оновити</button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted">
+                        <tr>
+                            <th scope="col" class="ps-4 py-3 border-0">Номер рейсу</th>
+                            <th scope="col" class="py-3 border-0">Маршрут</th>
+                            <th scope="col" class="py-3 border-0">Водій</th>
+                            <th scope="col" class="py-3 border-0">Транспорт</th>
+                            <th scope="col" class="py-3 border-0">Статус</th>
+                            <th scope="col" class="pe-4 py-3 border-0 text-end">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="ps-4 py-3 fw-bold text-dark">TRP-8492</td>
+                            <td class="py-3 fw-semibold">
+                                <span class="text-primary">Рівне</span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span class="text-success">Київ</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2 text-secondary" style="width: 30px; height: 30px;">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    Іваненко П.
+                                </div>
+                            </td>
+                            <td class="py-3 text-muted"><i class="bi bi-truck me-1"></i> MAN (BK5500CX)</td>
+                            <td class="py-3">
+                                <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm"><i class="bi bi-play-circle me-1"></i> В дорозі</span>
+                            </td>
+                            <td class="pe-4 py-3 text-end">
+                                <a href="#" class="btn btn-sm btn-outline-primary rounded-3 px-3 fw-bold">Деталі</a>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="ps-4 py-3 fw-bold text-dark">TRP-8493</td>
+                            <td class="py-3 fw-semibold">
+                                <span class="text-primary">Львів</span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span class="text-success">Дубно</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2 text-secondary" style="width: 30px; height: 30px;">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    Шевченко О.
+                                </div>
+                            </td>
+                            <td class="py-3 text-muted"><i class="bi bi-truck me-1"></i> IVECO (KA1234MK)</td>
+                            <td class="py-3">
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm"><i class="bi bi-clock-history me-1"></i> Завантаження</span>
+                            </td>
+                            <td class="pe-4 py-3 text-end">
+                                <a href="#" class="btn btn-sm btn-outline-primary rounded-3 px-3 fw-bold">Деталі</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+=======
 ﻿namespace LogisticsGroup.Web.Views.Logistician
 {
     public class Index
     {
     }
 }
+>>>>>>> main

@@ -1,5 +1,4 @@
 ﻿using LogisticsGroup.Web.Models;
-using LogisticsGroup.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -120,7 +119,7 @@ namespace LogisticsGroup.Web.Controllers
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return RedirectToAction("ResetPasswordConfirmation"); 
+                return RedirectToAction("ResetPasswordConfirmation");
 
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
@@ -139,6 +138,15 @@ namespace LogisticsGroup.Web.Controllers
         public IActionResult ResetPasswordConfirmation()
         {
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            return RedirectToAction("Login", "Account");
         }
     }
 }

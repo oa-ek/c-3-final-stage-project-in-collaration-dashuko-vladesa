@@ -1,6 +1,14 @@
-﻿namespace LogisticsGroup.Web.Controllers
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace LogisticsGroup.Web.Controllers
 {
-    public class DriverCabinetController
+    [Authorize]
+    public class DriverCabinetController : Controller
     {
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 }

@@ -4,35 +4,49 @@
     ViewData["Title"] = "Редагувати область";
 }
 
-<div class="container p-3">
-    <div class="row pt-4">
-        <h2 class="text-primary">Редагувати область</h2>
-        <hr />
-    </div>
-
-    <form method="post" asp-action="Edit">
-        <input type="hidden" asp-for="Id" />
-
-        <div class="border p-3 mt-4">
-            
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label">Назва області</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-success" style="width:150px">Оновити</button>
-                <a asp-controller="Region" asp-action="Index" class="btn btn-secondary" style="width:150px">
-                    Скасувати
-                </a>
-            </div>
+<div class="container-fluid mt-4 mb-5 d-flex justify-content-center">
+    <div class="card border-0 shadow-sm rounded-4" style="max-width: 700px; width: 100%;">
+        
+        <div class="card-header bg-white border-bottom-0 pt-5 pb-3 px-4 px-md-5">
+            <h3 class="fw-bold mb-1" style="color: #ed3237;">
+                <i class="bi bi-pencil-square me-2"></i> Редагувати область
+            </h3>
+            <p class="text-muted mb-0">Внесіть зміни до назви області. Вони відобразяться для всіх пов'язаних міст.</p>
         </div>
-    </form>
+
+        <div class="card-body px-4 px-md-5 pb-5 pt-3">
+            <form method="post" asp-action="Edit">
+                
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row g-4">
+                    <div class="col-md-12">
+                        <label asp-for="Name" class="form-label fw-bold text-dark">Назва області <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-lg shadow-sm rounded-3">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-type"></i></span>
+                            <input asp-for="Name" class="form-control border-start-0 ps-0" required />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <hr class="my-5" style="border-color: #e9ecef;">
+
+                <div class="d-flex gap-3 justify-content-end">
+                    <a asp-controller="Region" asp-action="Index" class="btn btn-light border px-4 py-2 fw-bold rounded-3 text-secondary shadow-sm">
+                        <i class="bi bi-arrow-left me-1"></i> Скасувати
+                    </a>
+                    <button type="submit" class="btn text-white px-5 py-2 fw-bold shadow-sm rounded-3" style="background-color: #198754;">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Оновити дані
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     @{
-        <partial name="_ValidationScriptsPartial" />
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
