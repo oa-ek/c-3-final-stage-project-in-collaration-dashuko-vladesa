@@ -4,52 +4,81 @@
     ViewData["Title"] = "Міста";
 }
 
-<div class="container p-3">
-    <div class="row pt-4">
-        <div class="col-6">
-            <h2 class="text-primary">Список міст</h2>
-        </div>
-        <div class="col-6 text-end">
-            <a asp-controller="City" asp-action="Create" class="btn btn-primary">
-                Додати нове місто
-            </a>
+<div class="container-fluid mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: #ed3237;">
+            <i class="bi bi-buildings me-2"></i> Список міст
+        </h2>
+        <a asp-controller="City" asp-action="Create" class="btn text-white fw-bold shadow-sm px-4 py-2" style="background-color: #ed3237; border-radius: 12px;">
+            <i class="bi bi-plus-lg me-2"></i> Додати нове місто
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted">
+                        <tr>
+                            <th scope="col" class="ps-4 py-3 border-0 rounded-top-start">Назва</th>
+                            <th scope="col" class="py-3 border-0">Тип населеного пункту</th>
+                            <th scope="col" class="py-3 border-0">Область</th>
+                            <th scope="col" class="pe-4 py-3 border-0 text-end rounded-top-end">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var obj in Model)
+                            {
+                                string typeBadgeClass = "bg-secondary";
+                                if (obj.Type != null)
+                                {
+                                    var typeStr = obj.Type.ToString();
+                                    if (typeStr.Contains("Місто")) typeBadgeClass = "bg-primary";
+                                    else if (typeStr.Contains("Село") || typeStr.Contains("СМТ")) typeBadgeClass = "bg-success";
+                                }
+
+                                <tr>
+                                    <td class="ps-4 py-3 fw-bold text-dark fs-5">@obj.Name</td>
+                                    
+                                    <td class="py-3">
+                                        <span class="badge @typeBadgeClass rounded-pill px-3 py-2 shadow-sm">
+                                            @obj.Type
+                                        </span>
+                                    </td>
+                                    
+                                    <td class="py-3 text-muted">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        @(obj.Region != null ? obj.Region.Name : "Не вказано")
+                                    </td>
+                                    
+                                    <td class="pe-4 py-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a asp-controller="City" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-secondary rounded-3 px-2" title="Редагувати">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-controller="City" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-danger rounded-3 px-2" title="Видалити">
+                                                <i class="bi bi-trash3"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-map d-block mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
+                                    <h5 class="fw-bold">База міст порожня</h5>
+                                    <p>Натисніть кнопку "Додати нове місто", щоб налаштувати інфраструктуру.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <br /><br />
-
-    <table class="table table-bordered table-striped" style="width:100%">
-        <thead>
-            <tr>
-                <th>Назва</th>
-                <th>Тип</th>
-                <th>Область</th>
-                <th class="text-center">Дії</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                @foreach (var obj in Model)
-                {
-                    <tr>
-                        <td width="30%">@obj.Name</td>
-                        <td width="20%">@obj.Type</td>
-                        <td width="30%">@(obj.Region != null ? obj.Region.Name : "Не вказано")</td>
-                        
-                       
-                        <td width="20%" class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a asp-controller="City" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-warning">Редагувати</a>
-                                <a asp-controller="City" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger">Видалити</a>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr><td colspan="4" class="text-center">Міст поки що немає.</td></tr>
-            }
-        </tbody>
-    </table>
 </div>

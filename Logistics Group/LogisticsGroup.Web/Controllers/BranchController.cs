@@ -21,7 +21,6 @@ namespace LogisticsGroup.Web.Controllers
             var branchList = _unitOfWork.Branch.GetAll().ToList();
             var cityList = _unitOfWork.City.GetAll().ToList();
 
-            
             foreach (var branch in branchList)
             {
                 branch.City = cityList.FirstOrDefault(c => c.Id == branch.CityId);
@@ -32,13 +31,14 @@ namespace LogisticsGroup.Web.Controllers
 
         public IActionResult Create()
         {
-            
             IEnumerable<SelectListItem> cityList = _unitOfWork.City.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.CityList = cityList;
+
+            // ВИПРАВЛЕНО: CityId замість CityList
+            ViewBag.CityId = cityList;
 
             return View();
         }
@@ -47,7 +47,6 @@ namespace LogisticsGroup.Web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Branch obj)
         {
-           
             ModelState.Remove("City");
 
             if (ModelState.IsValid)
@@ -62,7 +61,9 @@ namespace LogisticsGroup.Web.Controllers
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.CityList = cityList;
+
+            // ВИПРАВЛЕНО: CityId замість CityList
+            ViewBag.CityId = cityList;
 
             return View(obj);
         }
@@ -78,7 +79,9 @@ namespace LogisticsGroup.Web.Controllers
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.CityList = cityList;
+
+            // ВИПРАВЛЕНО: CityId замість CityList
+            ViewBag.CityId = cityList;
 
             return View(branchFromDb);
         }
@@ -101,7 +104,9 @@ namespace LogisticsGroup.Web.Controllers
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-            ViewBag.CityList = cityList;
+
+            // ВИПРАВЛЕНО: CityId замість CityList
+            ViewBag.CityId = cityList;
 
             return View(obj);
         }
@@ -112,7 +117,6 @@ namespace LogisticsGroup.Web.Controllers
             var branchFromDb = _unitOfWork.Branch.Get(u => u.Id == id);
             if (branchFromDb == null) return NotFound();
 
-           
             branchFromDb.City = _unitOfWork.City.Get(u => u.Id == branchFromDb.CityId);
 
             return View(branchFromDb);
