@@ -13,43 +13,32 @@
             <i class="bi bi-plus-lg me-2"></i> Додати нову машину
         </a>
     </div>
-<div class="container p-3">
-    <div class="row pt-4 mb-3">
-        <div class="col-6">
-            <h2 class="text-primary">Список Транспорту</h2>
-        </div>
-        <div class="col-6 text-end">
-            <a asp-controller="Vehicle" asp-action="Create" class="btn btn-primary">
-                Додати нову машину
-            </a>
-        </div>
-    </div>
 
-    <div class="row mb-4 p-3 border rounded bg-light align-items-center">
+    <div class="row mb-4 p-3 border rounded-pill bg-light align-items-center shadow-sm">
         <div class="col-md-7">
             <form asp-controller="Vehicle" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data" class="d-flex">
                 <input type="file" name="file" class="form-control me-2" accept=".xlsx" required />
-                <button type="submit" class="btn btn-success text-nowrap">📥 Імпорт з Excel</button>
+                <button type="submit" class="btn btn-success text-nowrap rounded-3">📥 Імпорт з Excel</button>
             </form>
         </div>
         <div class="col-md-5 text-end">
-            <a asp-controller="Vehicle" asp-action="ExportToExcel" class="btn btn-outline-success">
+            <a asp-controller="Vehicle" asp-action="ExportToExcel" class="btn btn-outline-success rounded-3">
                 📤 Експорт в Excel
             </a>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light text-muted">
                         <tr>
-                            <th scope="col" class="ps-4 py-3 border-0 rounded-top-start">Марка</th>
+                            <th scope="col" class="ps-4 py-3 border-0">Марка</th>
                             <th scope="col" class="py-3 border-0">Номерний знак</th>
                             <th scope="col" class="py-3 border-0">Вантажопідйомність</th>
                             <th scope="col" class="py-3 border-0">Статус</th>
-                            <th scope="col" class="pe-4 py-3 border-0 text-end rounded-top-end">Дії</th>
+                            <th scope="col" class="pe-4 py-3 border-0 text-end">Дії</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,45 +56,49 @@
                                     else if (statusStr.Contains("завантаженні")) badgeClass = "bg-warning text-dark";
                                 }
 
-                                <tr>
-                                    <td class="ps-4 py-3 fw-bold text-dark">@obj.Brand</td>
-                                    
-                                    <td class="py-3">
-                                        <span class="badge border border-secondary text-secondary bg-light px-2 py-1 fs-6" style="font-family: monospace; letter-spacing: 1px;">
+                                        <tr>
+                                            <td class="ps-4 py-3 fw-bold text-dark fs-6">
+                                                <i class="bi bi-truck-front text-danger me-2"></i>@obj.Brand
+                                            </td>
+
+                                            <td class="py-3">
+                                                <span class="badge bg-white text-dark border border-secondary px-2 py-1 fs-6 shadow-sm" style="font-family: monospace; letter-spacing: 1px; border-radius: 4px;">
                                             @obj.LicensePlate
-                                        </span>
-                                    </td>
-                                    
-                                    <td class="py-3 text-muted">@obj.Capacity т.</td>
-                                    
-                                    <td class="py-3">
-                                        <span class="badge @badgeClass rounded-pill px-3 py-2 shadow-sm">
+                                                </span>
+                                            </td>
+
+                                            <td class="py-3 text-muted fw-medium">
+                                        @obj.Capacity т.
+                                            </td>
+
+                                            <td class="py-3">
+                                                <span class="badge @badgeClass rounded-pill px-3 py-2 shadow-sm">
                                             @obj.Status
-                                        </span>
-                                    </td>
-                                    
-                                    <td class="pe-4 py-3 text-end">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a asp-controller="Vehicle" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-secondary rounded-3 px-2" title="Редагувати">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
-                                            <a asp-controller="Vehicle" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-outline-danger rounded-3 px-2" title="Видалити">
-                                                <i class="bi bi-trash3"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
+                                                </span>
+                                            </td>
+
+                                            <td class="pe-4 py-3 text-end">
+                                                <div class="d-flex justify-content-end gap-2">
+                                                    <a asp-controller="Vehicle" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-secondary rounded-3 px-2" title="Редагувати">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <a asp-controller="Vehicle" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-danger rounded-3 px-2" title="Видалити">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
                             }
                         }
                         else
                         {
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="bi bi-truck d-block mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
-                                    <h5 class="fw-bold">Машин поки що немає</h5>
-                                    <p>Натисніть кнопку "Додати нову машину", щоб поповнити автопарк.</p>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-truck d-block mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
+                                        <h5 class="fw-bold">Машин поки що немає</h5>
+                                        <p>Натисніть кнопку "Додати нову машину", щоб поповнити автопарк.</p>
+                                    </td>
+                                </tr>
                         }
                     </tbody>
                 </table>

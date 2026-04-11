@@ -1,10 +1,8 @@
-<<<<<<< HEAD
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsGroup.Web.Controllers
 {
-    
     [Authorize]
     public class DriverCabinetController : Controller
     {
@@ -14,11 +12,3 @@ namespace LogisticsGroup.Web.Controllers
         }
     }
 }
-=======
-﻿namespace LogisticsGroup.Web.Controllers
-{
-    public class DriverCabinetController
-    {
-    }
-}
->>>>>>> main

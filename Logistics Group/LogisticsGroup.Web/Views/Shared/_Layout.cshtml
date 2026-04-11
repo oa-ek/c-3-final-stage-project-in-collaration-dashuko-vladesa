@@ -57,78 +57,78 @@
                     <i class="bi bi-box-seam-fill me-2" style="color: #ed3237;"></i>
                     <span style="color: #ed3237;">Logistics</span><span class="text-dark">Group</span>
                 </a>
-                
+
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav mx-auto align-items-center flex-grow-1 justify-content-center">
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Driver" asp-action="Index">Водії</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Vehicle" asp-action="Index">Транспорт</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="CargoCategory" asp-action="Index">Категорії вантажів</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Region" asp-action="Index">Області</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="City" asp-action="Index">Міста</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
-                            </li>
-                            <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                                <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="CreateStaff">
-                                    <i class="bi bi-plus-lg me-1"></i> Персонал
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Driver" asp-action="Index">Водії</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Vehicle" asp-action="Index">Транспорт</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="CargoCategory" asp-action="Index">Категорії вантажів</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Region" asp-action="Index">Області</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="City" asp-action="Index">Міста</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
+                                </li>
+                                <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                                    <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="CreateStaff">
+                                        <i class="bi bi-plus-lg me-1"></i> Персонал
+                                    </a>
+                                </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Logistician"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link fw-bold" asp-controller="Logistician" asp-action="Index">
-                                    <i class="bi bi-radar me-1 text-danger"></i> Пульт Логіста
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-bold" asp-controller="Logistician" asp-action="Index">
+                                        <i class="bi bi-radar me-1 text-danger"></i> Пульт Логіста
+                                    </a>
+                                </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Driver"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link fw-bold" href="#">
-                                    <i class="bi bi-truck me-1 text-danger"></i> Мої Рейси
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-bold" href="#">
+                                        <i class="bi bi-truck me-1 text-danger"></i> Мої Рейси
+                                    </a>
+                                </li>
                         }
                     </ul>
 
                     <ul class="navbar-nav align-items-center">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item me-3">
-                                <span class="text-muted small">Привіт, <span class="fw-bold text-dark">@User.Identity?.Name</span>!</span>
-                            </li>
-                            <li class="nav-item">
-                                <form id="logoutForm" class="form-inline m-0" asp-controller="Account" asp-action="Logout" method="post">
-                                    <button id="logout" type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Вийти</button>
-                                </form>
-                            </li>
+                                <li class="nav-item me-3">
+                                    <span class="text-muted small">Привіт, <span class="fw-bold text-dark">@User.Identity?.Name</span>!</span>
+                                </li>
+                                <li class="nav-item">
+                                    <form id="logoutForm" class="form-inline m-0" asp-controller="Account" asp-action="Logout" method="post">
+                                        <button id="logout" type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Вийти</button>
+                                    </form>
+                                </li>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" asp-controller="Account" asp-action="Login">Увійти</a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" asp-controller="Account" asp-action="Login">Увійти</a>
+                                </li>
                         }
                     </ul>
 
@@ -136,7 +136,7 @@
             </div>
         </nav>
     </header>
-    
+
     <div class="container">
         <main role="main" class="pb-5">
             @RenderBody()
@@ -148,7 +148,7 @@
             &copy; 2026 - LogisticsGroup.Web 
         </div>
     </footer>
-    
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
