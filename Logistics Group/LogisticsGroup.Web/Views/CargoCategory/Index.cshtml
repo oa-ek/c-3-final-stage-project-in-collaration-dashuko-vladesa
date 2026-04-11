@@ -4,6 +4,76 @@
     ViewData["Title"] = "Категорії вантажів";
 }
 
+<<<<<<< HEAD
+<div class="container-fluid mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: #ed3237;">
+            <i class="bi bi-boxes me-2"></i> Список категорій вантажів
+        </h2>
+        <a asp-controller="CargoCategory" asp-action="Create" class="btn text-white fw-bold shadow-sm px-4 py-2" style="background-color: #ed3237; border-radius: 12px;">
+            <i class="bi bi-plus-lg me-2"></i> Додати нову категорію
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted">
+                        <tr>
+                            <th scope="col" class="ps-4 py-3 border-0 rounded-top-start">Назва категорії</th>
+                            <th scope="col" class="py-3 border-0">Мін. вага (кг)</th>
+                            <th scope="col" class="py-3 border-0">Макс. вага (кг)</th>
+                            <th scope="col" class="pe-4 py-3 border-0 text-end rounded-top-end">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var obj in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3 fw-bold text-dark fs-6">
+                                        <i class="bi bi-box-seam text-danger me-2"></i>@obj.Name
+                                    </td>
+                                    
+                                    <td class="py-3 text-muted">
+                                        <span class="badge bg-light text-dark border px-2 py-1 fs-6">@obj.MinWeight</span> кг
+                                    </td>
+
+                                    <td class="py-3 text-muted">
+                                        <span class="badge bg-light text-dark border px-2 py-1 fs-6">@obj.MaxWeight</span> кг
+                                    </td>
+                                    
+                                    <td class="pe-4 py-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a asp-controller="CargoCategory" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-secondary rounded-3 px-2" title="Редагувати">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-controller="CargoCategory" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-danger rounded-3 px-2" title="Видалити">
+                                                <i class="bi bi-trash3"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inboxes d-block mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
+                                    <h5 class="fw-bold">Категорії відсутні</h5>
+                                    <p>Додайте першу категорію вантажу для налаштування автопарку.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+=======
 <div class="container p-3">
     <div class="row pt-4 mb-3">
         <div class="col-6">
@@ -69,4 +139,5 @@
             }
         </tbody>
     </table>
+>>>>>>> main
 </div>
