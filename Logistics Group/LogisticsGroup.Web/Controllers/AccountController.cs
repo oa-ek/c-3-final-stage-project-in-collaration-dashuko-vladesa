@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -39,14 +40,27 @@ namespace LogisticsGroup.Web.Controllers
 
                 if (result.Succeeded)
                 {
+                    // Отримуємо дані користувача, який заходить
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    var roles = await _userManager.GetRolesAsync(user);
+
+
+                    if (roles.Contains("Driver"))
+                    {
+                        return RedirectToAction("Index", "DriverCabinet");
+                    }
+
+                    if (roles.Contains("Logistician"))
+                    {
+                        return RedirectToAction("Index", "Logistician");
+                    }
+
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
                         return Redirect(returnUrl);
                     }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -79,7 +93,6 @@ namespace LogisticsGroup.Web.Controllers
             }
 
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-
             var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Scheme);
 
             await _emailSender.SendEmailAsync(
@@ -103,11 +116,9 @@ namespace LogisticsGroup.Web.Controllers
             {
                 return BadRequest("Код для скидання паролю не знайдено.");
             }
-            else
-            {
-                var model = new ResetPasswordViewModel { Code = code };
-                return View(model);
-            }
+
+            var model = new ResetPasswordViewModel { Code = code };
+            return View(model);
         }
 
         [HttpPost]
@@ -145,7 +156,6 @@ namespace LogisticsGroup.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-
             return RedirectToAction("Login", "Account");
         }
     }
