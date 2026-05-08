@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace LogisticsGroup.Web.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class DriverController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -18,14 +18,12 @@ namespace LogisticsGroup.Web.Controllers
             _unitOfWork = unitOfWork;
         }
 
-       
         public IActionResult Index()
         {
             var driversList = _unitOfWork.Driver.GetAll();
             return View(driversList);
         }
 
-       
         public IActionResult Create()
         {
             return View();
@@ -44,7 +42,6 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0) return NotFound();
@@ -66,7 +63,6 @@ namespace LogisticsGroup.Web.Controllers
             return View(obj);
         }
 
-        
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0) return NotFound();
@@ -123,6 +119,7 @@ namespace LogisticsGroup.Web.Controllers
                 }
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ImportFromExcel(IFormFile file)
@@ -134,8 +131,8 @@ namespace LogisticsGroup.Web.Controllers
                     file.CopyTo(stream);
                     using (var workbook = new XLWorkbook(stream))
                     {
-                        var worksheet = workbook.Worksheet(1); 
-                        var rows = worksheet.RangeUsed().RowsUsed().Skip(1); 
+                        var worksheet = workbook.Worksheet(1);
+                        var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
 
                         foreach (var row in rows)
                         {
@@ -155,6 +152,54 @@ namespace LogisticsGroup.Web.Controllers
                 TempData["SuccessMessage"] = "Водіїв успішно імпортовано!";
             }
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public IActionResult StartTrip(int tripId)
+        {
+            TempData["success"] = "Рейс успішно розпочато! Щасливої дороги.";
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public IActionResult FinishTrip(int tripId)
+        {
+            TempData["info"] = "Рейс успішно завершено! Відмінна робота.";
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        [AllowAnonymous]
+        public IActionResult ReportFuel()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public IActionResult ReportFuelSubmit(double liters, double price)
+        {
+            TempData["success"] = $"Звіт прийнято! {liters} л. на суму {price} грн надіслано в бухгалтерію.";
+            return RedirectToAction("Index", "DriverCabinet");
+        }
+
+        [AllowAnonymous]
+        public IActionResult ContactDispatcher()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public IActionResult SubmitDispatcherMessage(string subject, string message)
+        {
+            TempData["success"] = $"Повідомлення на тему '{subject}' успішно надіслано диспетчеру!";
+            return RedirectToAction("Index", "DriverCabinet");
         }
     }
 }

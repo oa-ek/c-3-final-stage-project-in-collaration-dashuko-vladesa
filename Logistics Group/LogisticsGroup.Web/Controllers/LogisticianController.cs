@@ -1,5 +1,9 @@
+
 ﻿
 ﻿using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -9,6 +13,7 @@ namespace LogisticsGroup.Web.Controllers
         {
             return View();
         }
+
     }
 
     namespace LogisticsGroup.Web.Controllers
@@ -17,5 +22,6 @@ namespace LogisticsGroup.Web.Controllers
         {
 
         }
+
     }
 }

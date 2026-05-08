@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsGroup.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Driver")]
     public class DriverCabinetController : Controller
     {
         public IActionResult Index()

@@ -38,7 +38,6 @@ namespace LogisticsGroup.Web.Controllers
                 Value = u.Id.ToString()
             });
 
-            // ВИПРАВЛЕНО: CityId замість CityList
             ViewBag.CityId = cityList;
 
             return View();
@@ -63,7 +62,6 @@ namespace LogisticsGroup.Web.Controllers
                 Value = u.Id.ToString()
             });
 
-            // ВИПРАВЛЕНО: CityId замість CityList
             ViewBag.CityId = cityList;
 
             return View(obj);
@@ -81,7 +79,6 @@ namespace LogisticsGroup.Web.Controllers
                 Value = u.Id.ToString()
             });
 
-            // ВИПРАВЛЕНО: CityId замість CityList
             ViewBag.CityId = cityList;
 
             return View(branchFromDb);
@@ -106,7 +103,6 @@ namespace LogisticsGroup.Web.Controllers
                 Value = u.Id.ToString()
             });
 
-            // ВИПРАВЛЕНО: CityId замість CityList
             ViewBag.CityId = cityList;
 
             return View(obj);
@@ -175,12 +171,37 @@ namespace LogisticsGroup.Web.Controllers
                 }
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ImportFromExcel(IFormFile file)
         {
             if (file != null && file.Length > 0)
             {
+                // МАГІЧНИЙ БЛОК: Шукаємо залізобетонне Місто
+                var validCity = _unitOfWork.City.GetAll().FirstOrDefault();
+
+                // Якщо база зовсім пуста, робимо "рятувальне коло"
+                if (validCity == null)
+                {
+                    var validRegion = _unitOfWork.Region.GetAll().FirstOrDefault();
+                    if (validRegion == null)
+                    {
+                        validRegion = new Region { Name = "Базовий Регіон (Автоматичний)" };
+                        _unitOfWork.Region.Add(validRegion);
+                        _unitOfWork.Save();
+                    }
+
+                    validCity = new City
+                    {
+                        Name = "Базове Місто (Автоматичне)",
+                        Type = "Місто",
+                        RegionId = validRegion.Id
+                    };
+                    _unitOfWork.City.Add(validCity);
+                    _unitOfWork.Save();
+                }
+
                 using (var stream = new MemoryStream())
                 {
                     file.CopyTo(stream);
@@ -197,16 +218,15 @@ namespace LogisticsGroup.Web.Controllers
                                 parsedMaxWeight = maxWeight;
                             }
 
-                            int.TryParse(row.Cell(7).GetString(), out int cityId);
-
                             var branch = new Branch
                             {
                                 Number = row.Cell(2).GetString(),
                                 Address = row.Cell(3).GetString(),
                                 Type = row.Cell(4).GetString(),
-                                WorkingHours = row.Cell(5).GetString(), 
+                                WorkingHours = row.Cell(5).GetString(),
                                 MaxWeight = parsedMaxWeight,
-                                CityId = cityId
+                                // ІГНОРУЄМО EXCEL! Беремо перевірене місто з бази:
+                                CityId = validCity.Id
                             };
 
                             _unitOfWork.Branch.Add(branch);

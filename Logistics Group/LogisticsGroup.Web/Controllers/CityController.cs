@@ -4,7 +4,6 @@ using LogisticsGroup.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ClosedXML.Excel;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -18,16 +17,11 @@ namespace LogisticsGroup.Web.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        
         public IActionResult Index()
         {
-            
             var cityList = _unitOfWork.City.GetAll().ToList();
-
-           
             var regionList = _unitOfWork.Region.GetAll().ToList();
 
-            
             foreach (var city in cityList)
             {
                 city.Region = regionList.FirstOrDefault(r => r.Id == city.RegionId);
@@ -44,11 +38,10 @@ namespace LogisticsGroup.Web.Controllers
                 Value = u.Id.ToString()
             });
 
-            
             ViewBag.RegionId = regionList;
-
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(City obj)
@@ -86,9 +79,7 @@ namespace LogisticsGroup.Web.Controllers
                 Value = u.Id.ToString()
             });
 
-            
             ViewBag.RegionId = regionList;
-
             return View(cityFromDb);
         }
 
@@ -122,9 +113,7 @@ namespace LogisticsGroup.Web.Controllers
             var cityFromDb = _unitOfWork.City.Get(u => u.Id == id);
             if (cityFromDb == null) return NotFound();
 
-            
             cityFromDb.Region = _unitOfWork.Region.Get(u => u.Id == cityFromDb.RegionId);
-
             return View(cityFromDb);
         }
 
@@ -138,6 +127,7 @@ namespace LogisticsGroup.Web.Controllers
             _unitOfWork.Save();
             return RedirectToAction("Index");
         }
+
         public IActionResult ExportToExcel()
         {
             var cities = _unitOfWork.City.GetAll().ToList();
@@ -172,6 +162,7 @@ namespace LogisticsGroup.Web.Controllers
                 }
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ImportFromExcel(IFormFile file)
@@ -188,20 +179,27 @@ namespace LogisticsGroup.Web.Controllers
 
                         foreach (var row in rows)
                         {
-                            int.TryParse(row.Cell(4).GetString(), out int regionId);
+                            int.TryParse(row.Cell(4).GetString(), out int excelRegionId);
+
+                            var regionExists = _unitOfWork.Region.Get(u => u.Id == excelRegionId);
+
+                            if (regionExists == null)
+                            {
+                                continue;
+                            }
 
                             var city = new City
                             {
                                 Name = row.Cell(2).GetString(),
                                 Type = row.Cell(3).GetString(),
-                                RegionId = regionId
+                                RegionId = excelRegionId
                             };
                             _unitOfWork.City.Add(city);
                         }
                         _unitOfWork.Save();
                     }
                 }
-                TempData["success"] = "Міста успішно імпортовано!";
+                TempData["success"] = "Міста успішно розкидано по правильних областях!";
             }
             return RedirectToAction("Index");
         }

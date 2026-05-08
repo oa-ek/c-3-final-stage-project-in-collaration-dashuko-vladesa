@@ -1,0 +1,67 @@
+﻿@model LogisticsGroup.Domain.Entities.Trip
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Створення рейсу";
+}
+
+<div class="container-fluid mt-4 mb-5" style="max-width: 800px; margin: 0 auto;">
+    
+    <div class="d-flex align-items-center mb-4">
+        <a href="/Logistician/Index" class="btn btn-light rounded-circle shadow-sm me-3 border" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-arrow-left fs-4 text-dark"></i>
+        </a>
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Створити новий рейс</h3>
+            <p class="text-muted mb-0 small">Введіть ID номерів для бази даних</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            
+            <form method="post" action="/Logistician/Create">
+                @Html.AntiForgeryToken()
+
+                <h5 class="fw-bold mb-3 border-bottom pb-2">📍 Маршрут (ID Відділень)</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">Відділення відправлення (ID)</label>
+                        <input type="number" name="DepartureBranchId" class="form-control bg-light border shadow-sm" placeholder="Наприклад: 1" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">Відділення прибуття (ID)</label>
+                        <input type="number" name="ArrivalBranchId" class="form-control bg-light border shadow-sm" placeholder="Наприклад: 2" required>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-3 border-bottom pb-2">🚚 Замовлення</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-12">
+                        <label class="form-label text-muted small fw-bold">Замовлення на транспорт (ID)</label>
+                        <input type="number" name="TransportOrderId" class="form-control bg-light border shadow-sm" placeholder="Введіть номер існуючого замовлення" required>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-3 border-bottom pb-2">⏱ Графік</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">Час завантаження</label>
+                        <input type="datetime-local" name="LoadingTime" class="form-control bg-light border shadow-sm" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">Час розвантаження</label>
+                        <input type="datetime-local" name="UnloadingTime" class="form-control bg-light border shadow-sm" required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="/Logistician/Index" class="btn btn-light px-4 py-2 fw-bold shadow-sm me-2">Скасувати</a>
+                    <button type="submit" class="btn text-white px-5 py-2 fw-bold shadow-sm" style="background-color: #ed3237;">
+                        <i class="bi bi-check-lg me-1"></i> Зберегти рейс
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

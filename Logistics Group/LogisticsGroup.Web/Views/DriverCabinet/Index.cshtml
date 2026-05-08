@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-﻿@{
+@{
     Layout = "_DriverLayout";
     ViewData["Title"] = "Мій рейс";
    
@@ -7,11 +6,10 @@
 }
 
 <style>
-    
     .mobile-app-container {
-        max-width: 480px; 
+        max-width: 480px;
         margin: 0 auto;
-        padding-bottom: 80px; 
+        padding-bottom: 80px;
     }
     
     .route-timeline {
@@ -42,12 +40,11 @@
     }
     
         .timeline-dot.destination {
-            border-color: #198754; /* Зелений для точки прибуття */
+            border-color: #198754;
             bottom: 0;
             top: auto;
         }
 
-    /* Плаваюча кнопка знизу екрана (як у додатках) */
     .floating-action-btn {
         position: fixed;
         bottom: 30px;
@@ -58,7 +55,6 @@
         z-index: 1000;
     }
     
-   
     footer {
         display: none !important;
     }
@@ -78,9 +74,18 @@
 
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h5 class="fw-bold mb-0">Поточний рейс</h5>
-        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm fw-bold">
-            <i class="bi bi-clock-history me-1"></i> Очікує старту
-        </span>
+        @if (TempData["success"] != null)
+        {
+            <span class="badge bg-success text-white rounded-pill px-3 py-2 shadow-sm fw-bold">
+                <i class="bi bi-truck me-1"></i> В дорозі
+            </span>
+        }
+        else
+        {
+            <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm fw-bold">
+                <i class="bi bi-clock-history me-1"></i> Очікує старту
+            </span>
+        }
     </div>
 
     <div class="card border-0 shadow-sm rounded-4 mb-4 position-relative overflow-hidden">
@@ -123,7 +128,7 @@
 
     <div class="row g-3 mb-5 pb-5">
         <div class="col-6">
-            <a href="#" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none bg-white">
+            <a asp-controller="Driver" asp-action="ContactDispatcher" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none bg-white">
                 <div class="card-body text-center p-3">
                     <i class="bi bi-telephone-fill d-block mb-2 text-primary" style="font-size: 1.8rem;"></i>
                     <span class="text-dark fw-bold small">Диспетчер</span>
@@ -131,7 +136,7 @@
             </a>
         </div>
         <div class="col-6">
-            <a href="#" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none bg-white">
+            <a asp-controller="Driver" asp-action="ReportFuel" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none bg-white">
                 <div class="card-body text-center p-3">
                     <i class="bi bi-fuel-pump-fill d-block mb-2 text-danger" style="font-size: 1.8rem;"></i>
                     <span class="text-dark fw-bold small">Заправка</span>
@@ -141,16 +146,23 @@
     </div>
 
     <div class="floating-action-btn">
-        <button class="btn btn-lg w-100 text-white fw-bold shadow rounded-pill py-3 d-flex justify-content-center align-items-center" style="background-color: #198754; font-size: 1.2rem; transition: transform 0.2s;">
-            <i class="bi bi-play-circle-fill me-2 fs-3"></i> Почати рейс
-        </button>
+        @if (TempData["success"] != null)
+        {
+            <form asp-controller="Driver" asp-action="FinishTrip" method="post" class="m-0 p-0 w-100">
+                <input type="hidden" name="tripId" value="1" />
+                <button type="submit" class="btn btn-lg w-100 text-white fw-bold shadow rounded-pill py-3 d-flex justify-content-center align-items-center" style="background-color: #dc3545; border: none; font-size: 1.2rem; transition: transform 0.2s;">
+                    <i class="bi bi-stop-circle-fill me-2 fs-3"></i> Завершити рейс
+                </button>
+            </form>
+        }
+        else
+        {
+            <form asp-controller="Driver" asp-action="StartTrip" method="post" class="m-0 p-0 w-100">
+                <input type="hidden" name="tripId" value="1" />
+                <button type="submit" class="btn btn-lg w-100 text-white fw-bold shadow rounded-pill py-3 d-flex justify-content-center align-items-center" style="background-color: #198754; border: none; font-size: 1.2rem; transition: transform 0.2s;">
+                    <i class="bi bi-play-circle-fill me-2 fs-3"></i> Почати рейс
+                </button>
+            </form>
+        }
     </div>
 </div>
-=======
-﻿namespace LogisticsGroup.Web.Views.DriverCabinet
-{
-    public class Index
-    {
-    }
-}
->>>>>>> main

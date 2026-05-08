@@ -1,0 +1,47 @@
+﻿@{
+    Layout = "_DriverLayout";
+    ViewData["Title"] = "Зв'язок з диспетчером";
+}
+
+<div class="container-fluid mt-3 mb-5" style="max-width: 480px; margin: 0 auto;">
+    
+    <div class="d-flex align-items-center mb-4 pt-2">
+        <a asp-controller="DriverCabinet" asp-action="Index" class="btn btn-light rounded-circle shadow-sm me-3 border" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-arrow-left fs-4 text-dark"></i>
+        </a>
+        <h4 class="fw-bold text-dark mb-0">Диспетчер</h4>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-headset text-primary" style="font-size: 3.5rem;"></i>
+                <p class="text-muted mt-3 small">Опишіть проблему, і вільний логіст зв'яжеться з вами найближчим часом.</p>
+            </div>
+
+            <form asp-controller="Driver" asp-action="SubmitDispatcherMessage" method="post">
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted small">Тема звернення</label>
+                    <select name="subject" class="form-select form-select-lg border shadow-sm rounded-3 bg-light" required>
+                        <option value="" disabled selected>Оберіть категорію...</option>
+                        <option value="Поломка авто">⚠️ Поломка авто</option>
+                        <option value="Затримка в дорозі">⏳ Затримка в дорозі</option>
+                        <option value="Проблема з вантажем">📦 Проблема з вантажем</option>
+                        <option value="Інше питання">💬 Інше питання</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small">Деталі ситуації</label>
+                    <textarea name="message" class="form-control border shadow-sm rounded-3 bg-light" rows="4" placeholder="Опишіть проблему детальніше..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-lg w-100 text-white rounded-pill shadow-sm fw-bold mt-2" style="background-color: #0d6efd;">
+                    <i class="bi bi-send-fill me-2"></i> Надіслати
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>

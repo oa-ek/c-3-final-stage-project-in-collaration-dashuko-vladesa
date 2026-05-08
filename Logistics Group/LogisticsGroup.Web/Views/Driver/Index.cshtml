@@ -16,7 +16,7 @@
 
     <div class="row mb-4 p-3 border rounded-pill bg-light align-items-center shadow-sm">
         <div class="col-md-7">
-            <form asp-controller="Driver" asp-action="ImportToExcel" method="post" enctype="multipart/form-data" class="d-flex">
+            <form asp-controller="Driver" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data" class="d-flex">
                 <input type="file" name="file" class="form-control me-2" accept=".xlsx" required />
                 <button type="submit" class="btn btn-success text-nowrap rounded-3">📥 Імпорт з Excel</button>
             </form>
@@ -42,44 +42,44 @@
                         {
                             @foreach (var obj in Model)
                             {
-                                        <tr>
-                                            <td class="ps-4 py-3 fw-bold text-dark fs-5">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3 text-secondary border" style="width: 45px; height: 45px;">
-                                                        <i class="bi bi-person-fill fs-4"></i>
-                                                    </div>
+                                <tr>
+                                    <td class="ps-4 py-3 fw-bold text-dark fs-5">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3 text-secondary border" style="width: 45px; height: 45px;">
+                                                <i class="bi bi-person-fill fs-4"></i>
+                                            </div>
                                             @obj.FullName
-                                                </div>
-                                            </td>
+                                        </div>
+                                    </td>
 
-                                            <td class="py-3 text-muted">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="bi bi-telephone-fill me-2" style="color: #ed3237;"></i>
-                                                    <span class="fw-semibold">@obj.Phone</span>
-                                                </div>
-                                            </td>
+                                    <td class="py-3 text-muted">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-telephone-fill me-2" style="color: #ed3237;"></i>
+                                            <span class="fw-semibold">@obj.Phone</span>
+                                        </div>
+                                    </td>
 
-                                            <td class="pe-4 py-3 text-end">
-                                                <div class="d-flex justify-content-end gap-2">
-                                                    <a asp-controller="Driver" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-secondary rounded-3 px-2" title="Редагувати">
-                                                        <i class="bi bi-pencil-square"></i>
-                                                    </a>
-                                                    <a asp-controller="Driver" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-danger rounded-3 px-2" title="Видалити">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                    <td class="pe-4 py-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a asp-controller="Driver" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-secondary rounded-3 px-2" title="Редагувати">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-controller="Driver" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-outline-danger rounded-3 px-2" title="Видалити">
+                                                <i class="bi bi-trash3"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
                             }
                         }
                         else
                         {
-                                <tr>
-                                    <td colspan="3" class="text-center py-5 text-muted">
-                                        <i class="bi bi-people d-block mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
-                                        <h5 class="fw-bold">Штат водіїв порожній</h5>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-people d-block mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
+                                    <h5 class="fw-bold">Штат водіїв порожній</h5>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>

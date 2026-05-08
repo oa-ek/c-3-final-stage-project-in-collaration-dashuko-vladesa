@@ -1,0 +1,49 @@
+﻿@{
+    Layout = "_DriverLayout";
+    ViewData["Title"] = "Звіт про пальне";
+}
+
+<div class="container-fluid mt-3 mb-5" style="max-width: 480px; margin: 0 auto;">
+    
+    <div class="d-flex align-items-center mb-4 pt-2">
+        <a asp-controller="Driver" asp-action="Index" class="btn btn-light rounded-circle shadow-sm me-3 border" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-arrow-left fs-4 text-dark"></i>
+        </a>
+        <h4 class="fw-bold text-dark mb-0">Заправка авто</h4>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-fuel-pump-fill text-danger" style="font-size: 3.5rem;"></i>
+                <p class="text-muted mt-3 small">Внесіть дані з чеку АЗС для розрахунку витрат та компенсації бухгалтерією.</p>
+            </div>
+
+            <form asp-controller="Driver" asp-action="ReportFuelSubmit" method="post">
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted small">Кількість літрів</label>
+                    <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border">
+                        <span class="input-group-text bg-white border-0"><i class="bi bi-droplet-half text-primary"></i></span>
+                        <input type="number" name="liters" class="form-control border-0 bg-white" placeholder="0.00" step="0.01" required>
+                        <span class="input-group-text bg-white border-0 text-muted fw-bold">л.</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small">Сума до оплати (за чеком)</label>
+                    <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border">
+                        <span class="input-group-text bg-white border-0"><i class="bi bi-cash-stack text-success"></i></span>
+                        <input type="number" name="price" class="form-control border-0 bg-white" placeholder="0.00" step="0.01" required>
+                        <span class="input-group-text bg-white border-0 text-muted fw-bold">грн</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-lg w-100 text-white rounded-pill shadow-sm fw-bold mt-2" style="background-color: #ed3237;">
+                    <i class="bi bi-check-circle me-2"></i> Надіслати звіт
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
