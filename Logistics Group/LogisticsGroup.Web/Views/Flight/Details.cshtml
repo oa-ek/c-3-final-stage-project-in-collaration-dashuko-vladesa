@@ -1,0 +1,75 @@
+﻿@model LogisticsGroup.Domain.Entities.Flight
+
+@{
+    ViewData["Title"] = "Деталі рейсу";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary"><i class="bi bi-info-square"></i> Деталі рейсу #@Model.Id</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">
+            <i class="bi bi-arrow-left"></i> Назад до списку
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                    <h5 class="mb-0"><i class="bi bi-truck"></i> Інформація</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2 text-muted">Статус рейсу</p>
+                    <h5 class="mb-4"><span class="badge bg-primary">В дорозі</span></h5>
+
+                    <p class="mb-2 text-muted">Дата відправлення</p>
+                    <h6 class="mb-4">@Model.DepartureDate.ToString("dd.MM.yyyy HH:mm")</h6>
+
+                    <p class="mb-2 text-muted">Водій</p>
+                    <h6 class="mb-4">@(Model.Driver?.FullName ?? "Не призначено")</h6>
+
+                    <p class="mb-2 text-muted">Транспорт</p>
+                    <h6>@(Model.Vehicle?.LicensePlate ?? "Не вказано") (@(Model.Vehicle?.Brand))</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0 fw-bold">Посилки у цьому рейсі (@(Model.Parcels?.Count ?? 0) шт.)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush rounded-bottom-4">
+                        @if (Model.Parcels != null && Model.Parcels.Any())
+                        {
+                            @foreach (var parcel in Model.Parcels)
+                            {
+                                        <li class="list-group-item p-3 d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold fs-5 text-dark">TTN-@parcel.Id</div>
+                                                <small class="text-muted">
+                                                    Куди: @(parcel.ReceiverBranch?.City?.Name ?? "Невідомо") 
+                                                    (Відділення №@(parcel.ReceiverBranch?.Id ?? 0))
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-secondary rounded-pill mb-1">@parcel.Weight кг</span>
+                                                <br/>
+                                                <span class="badge bg-info text-dark rounded-pill">@parcel.Status</span>
+                                            </div>
+                                        </li>
+                            }
+                        }
+                        else
+                        {
+                                <li class="list-group-item p-4 text-center text-muted">
+                                    <i>У цьому рейсі немає посилок.</i>
+                                </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

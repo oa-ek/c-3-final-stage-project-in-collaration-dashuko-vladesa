@@ -1,0 +1,70 @@
+﻿@model IEnumerable<LogisticsGroup.Domain.Entities.Parcel>
+@{
+    ViewData["Title"] = "Формування рейсу";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="text-danger fw-bold mb-4"><i class="bi bi-truck"></i> Формування рейсу</h2>
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body bg-light rounded-4">
+                <h5 class="fw-bold mb-3">Вибрані посилки (@(Model?.Count() ?? 0) шт.):</h5>
+                <ul class="list-group list-group-flush rounded border">
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var parcel in Model)
+                        {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="fw-bold me-2">@parcel.Barcode</span>
+                                            <small class="text-muted">Куди: @(parcel.ReceiverBranch?.City?.Name ?? "Невідомо")</small>
+                                        </div>
+                                        <span class="badge bg-secondary rounded-pill">@parcel.Weight кг</span>
+                                    </li>
+                        }
+                    }
+                    else
+                    {
+                            <li class="list-group-item text-muted text-center">Жодної посилки не вибрано</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4">
+                <form asp-action="CreateFlight" method="post">
+
+                    @if (ViewBag.SelectedParcelIds != null)
+                    {
+                        foreach (var id in ViewBag.SelectedParcelIds)
+                        {
+                <input type="hidden" name="parcelIds" value="@id" />
+                        }
+                    }
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Оберіть Транспорт (Фуру)</label>
+                        <select name="vehicleId" class="form-select form-select-lg" asp-items="ViewBag.Vehicles" required>
+                            <option value="">-- Виберіть транспорт --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Оберіть Водія</label>
+                        <select name="driverId" class="form-select form-select-lg" asp-items="ViewBag.Drivers" required>
+                            <option value="">-- Виберіть водія --</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold rounded-pill">
+                            <i class="bi bi-check-circle"></i> Затвердити рейс і відправити
+                        </button>
+                        <a asp-controller="Logistician" asp-action="Index" class="btn btn-outline-secondary rounded-pill">Скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

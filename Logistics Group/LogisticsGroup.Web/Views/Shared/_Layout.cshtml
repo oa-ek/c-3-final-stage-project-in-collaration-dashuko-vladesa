@@ -68,67 +68,83 @@
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                         {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Driver" asp-action="Index">Водії</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Vehicle" asp-action="Index">Транспорт</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="CargoCategory" asp-action="Index">Категорії вантажів</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Region" asp-action="Index">Області</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="City" asp-action="Index">Міста</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
-                                </li>
-                                <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                                    <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="CreateStaff">
-                                        <i class="bi bi-plus-lg me-1"></i> Персонал
-                                    </a>
-                                </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-area="" asp-controller="Driver" asp-action="Index">Водії</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-area="" asp-controller="Vehicle" asp-action="Index">Транспорт</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-area="" asp-controller="CargoCategory" asp-action="Index">Категорії вантажів</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-area="" asp-controller="Region" asp-action="Index">Області</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-area="" asp-controller="City" asp-action="Index">Міста</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link fw-bold text-dark" asp-area="" asp-controller="Parcel" asp-action="Index">📦 Посилки</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link fw-bold text-dark" asp-area="" asp-controller="Flight" asp-action="Index">🚚 Рейси</a>
+                                        </li>
+                                        <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                                            <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="CreateStaff">
+                                                <i class="bi bi-plus-lg me-1"></i> Персонал
+                                            </a>
+                                        </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Logistician"))
                         {
-                                <li class="nav-item">
-                                    <a class="nav-link fw-bold" asp-controller="Logistician" asp-action="Index">
-                                        <i class="bi bi-radar me-1 text-danger"></i> Пульт Логіста
-                                    </a>
-                                </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link fw-bold" asp-controller="Logistician" asp-action="Index">
+                                                <i class="bi bi-radar me-1 text-danger"></i> Пульт Логіста
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link fw-bold" asp-controller="Parcel" asp-action="Index">
+                                                <i class="bi bi-box-seam me-1 text-danger"></i> Віртуальний склад (Посилки)
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link fw-bold" asp-controller="Flight" asp-action="Index">
+                                                <i class="bi bi-truck-front me-1 text-danger"></i> Активні рейси
+                                            </a>
+                                        </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Driver"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link fw-bold" asp-controller="DriverCabinet" asp-action="Index">
-                                    <i class="bi bi-truck me-1 text-danger"></i> Мої Рейси
-                                </a>
-                            </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link fw-bold" asp-controller="DriverCabinet" asp-action="Index">
+                                            <i class="bi bi-truck me-1 text-danger"></i> Мої Рейси
+                                        </a>
+                                    </li>
                         }
                     </ul>
 
                     <ul class="navbar-nav align-items-center">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                                <li class="nav-item me-3">
-                                    <span class="text-muted small">Привіт, <span class="fw-bold text-dark">@User.Identity?.Name</span>!</span>
-                                </li>
-                                <li class="nav-item">
-                                    <form id="logoutForm" class="form-inline m-0" asp-controller="Account" asp-action="Logout" method="post">
-                                        <button id="logout" type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Вийти</button>
-                                    </form>
-                                </li>
+                                        <li class="nav-item me-3">
+                                            <span class="text-muted small">Привіт, <span class="fw-bold text-dark">@User.Identity?.Name</span>!</span>
+                                        </li>
+                                        <li class="nav-item">
+                                            <form id="logoutForm" class="form-inline m-0" asp-controller="Account" asp-action="Logout" method="post">
+                                                <button id="logout" type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Вийти</button>
+                                            </form>
+                                        </li>
                         }
                         else
                         {
-                                <li class="nav-item">
-                                    <a class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" asp-controller="Account" asp-action="Login">Увійти</a>
-                                </li>
+                                        <li class="nav-item">
+                                            <a class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" asp-controller="Account" asp-action="Login">Увійти</a>
+                                        </li>
                         }
                     </ul>
 

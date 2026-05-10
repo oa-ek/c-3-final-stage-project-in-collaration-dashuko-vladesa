@@ -1,168 +1,80 @@
-﻿@{
-    Layout = "_DriverLayout";
-    ViewData["Title"] = "Мій рейс";
-   
-    var driverName = User.Identity?.Name ?? "Водій";
+﻿@model LogisticsGroup.Domain.Entities.Flight
+@{
+    ViewData["Title"] = "Кабінет Водія";
 }
 
-<style>
-    .mobile-app-container {
-        max-width: 480px;
-        margin: 0 auto;
-        padding-bottom: 80px;
-    }
-    
-    .route-timeline {
-        position: relative;
-        padding-left: 30px;
-    }
-    
-        .route-timeline::before {
-            content: '';
-            position: absolute;
-            left: 9px;
-            top: 10px;
-            bottom: 10px;
-            width: 2px;
-            background-color: #dee2e6;
-            border-left: 2px dashed #ccc;
-        }
+<div class="container mt-4 mb-5" style="max-width: 600px; margin: auto;">
+    <h2 class="fw-bold mb-4 text-center" style="color: #ed3237;">
+        <i class="bi bi-truck me-2"></i> Мій поточний рейс
+    </h2>
 
-    .timeline-dot {
-        position: absolute;
-        left: 0;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: white;
-        border: 4px solid #ed3237;
-        z-index: 2;
-    }
-    
-        .timeline-dot.destination {
-            border-color: #198754;
-            bottom: 0;
-            top: auto;
-        }
-
-    .floating-action-btn {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100% - 40px);
-        max-width: 440px;
-        z-index: 1000;
-    }
-    
-    footer {
-        display: none !important;
-    }
-</style>
-
-<div class="container-fluid mt-3 mb-5 mobile-app-container">
-    
-    <div class="d-flex justify-content-between align-items-center mb-4 pt-2">
-        <div>
-            <p class="text-muted mb-0 fs-6">Вітаємо,</p>
-            <h3 class="fw-bold text-dark mb-0">@driverName 👋</h3>
-        </div>
-        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center shadow-sm border" style="width: 50px; height: 50px;">
-            <i class="bi bi-person-fill fs-2 text-secondary"></i>
-        </div>
-    </div>
-
-    <div class="d-flex align-items-center justify-content-between mb-3">
-        <h5 class="fw-bold mb-0">Поточний рейс</h5>
-        @if (TempData["success"] != null)
-        {
-            <span class="badge bg-success text-white rounded-pill px-3 py-2 shadow-sm fw-bold">
-                <i class="bi bi-truck me-1"></i> В дорозі
-            </span>
-        }
-        else
-        {
-            <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm fw-bold">
-                <i class="bi bi-clock-history me-1"></i> Очікує старту
-            </span>
-        }
-    </div>
-
-    <div class="card border-0 shadow-sm rounded-4 mb-4 position-relative overflow-hidden">
-        <div class="position-absolute top-0 bottom-0 start-0" style="width: 6px; background-color: #ed3237;"></div>
-        
-        <div class="card-body p-4 ps-4">
-            <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
-                <div class="text-muted small fw-bold">РЕЙС № TRP-8492</div>
-                <div class="text-danger small fw-bold"><i class="bi bi-truck me-1"></i> MAN (BK 5500 CX)</div>
+    @if (Model == null)
+    {
+            <div class="alert alert-success text-center shadow-sm rounded-4 p-5 bg-white border-0">
+                <i class="bi bi-cup-hot fs-1 text-success d-block mb-3"></i>
+                <h4 class="fw-bold">Немає активних рейсів</h4>
+                <p class="mb-0 text-muted">Ви вільні! Очікуйте на нові призначення від логіста.</p>
             </div>
-
-            <div class="route-timeline my-4">
-                <div class="timeline-dot" style="top: 0;"></div>
-                <div class="mb-4">
-                    <div class="text-muted small">Відправлення</div>
-                    <h4 class="fw-bold mb-0 text-dark">Рівне</h4>
-                    <div class="text-muted small"><i class="bi bi-building me-1"></i> Відділення №1 (вул. Дубенська, 46)</div>
+    }
+    else
+    {
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+                <div class="card-header text-white text-center py-3" 
+                     style="background-color: @(Model.Status == "Доставлено" ? "#198754" : (Model.Status == "В дорозі" ? "#fd7e14" : "#0d6efd"));">
+                    <h5 class="mb-0 fw-bold">
+                        Статус рейсу: @Model.Status
+                    </h5>
                 </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <div>
+                            <small class="text-muted d-block">Номер рейсу</small>
+                            <span class="fw-bold fs-5">FLT-@Model.Id</span>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block">Відправлення</small>
+                            <span class="fw-bold">@Model.DepartureDate.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                    </div>
 
-                <div class="timeline-dot destination"></div>
-                <div class="mt-4">
-                    <div class="text-muted small">Прибуття</div>
-                    <h4 class="fw-bold mb-0 text-dark">Київ</h4>
-                    <div class="text-muted small"><i class="bi bi-building me-1"></i> Центральний термінал</div>
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2"><i class="bi bi-box-seam me-2"></i> Вантаж</h6>
+                        <div class="bg-light p-3 rounded-3 fw-bold">
+                        @(Model.Parcels?.Count ?? 0) посилок на борту
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2"><i class="bi bi-car-front me-2"></i> Транспорт</h6>
+                        <div class="bg-light p-3 rounded-3 d-flex justify-content-between align-items-center">
+                            <span>@Model.Vehicle?.Brand</span>
+                            <span class="badge bg-secondary fs-6">@Model.Vehicle?.LicensePlate</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3 mt-4">
+                    @if (Model.Status == "Створено")
+                    {
+                                <form asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <input type="hidden" name="newStatus" value="В дорозі" />
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm py-3">
+                                        <i class="bi bi-play-fill me-2 fs-5"></i> Виїхати (В дорозі)
+                                    </button>
+                                </form>
+                    }
+                    else if (Model.Status == "В дорозі")
+                    {
+                                <form asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <input type="hidden" name="newStatus" value="Доставлено" />
+                                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm py-3">
+                                        <i class="bi bi-check-circle-fill me-2 fs-5"></i> Прибув (Доставлено)
+                                    </button>
+                                </form>
+                    }
+                    </div>
                 </div>
             </div>
-
-            <div class="bg-light rounded-3 p-3 mt-3 d-flex justify-content-between align-items-center border">
-                <div>
-                    <div class="text-muted small">Вантаж</div>
-                    <div class="fw-bold text-dark fs-5">14.5 тонн</div>
-                </div>
-                <div class="text-end">
-                    <div class="text-muted small">Категорія</div>
-                    <div class="fw-bold text-dark fs-5">Палети</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-5 pb-5">
-        <div class="col-6">
-            <a asp-controller="Driver" asp-action="ContactDispatcher" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none bg-white">
-                <div class="card-body text-center p-3">
-                    <i class="bi bi-telephone-fill d-block mb-2 text-primary" style="font-size: 1.8rem;"></i>
-                    <span class="text-dark fw-bold small">Диспетчер</span>
-                </div>
-            </a>
-        </div>
-        <div class="col-6">
-            <a asp-controller="Driver" asp-action="ReportFuel" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none bg-white">
-                <div class="card-body text-center p-3">
-                    <i class="bi bi-fuel-pump-fill d-block mb-2 text-danger" style="font-size: 1.8rem;"></i>
-                    <span class="text-dark fw-bold small">Заправка</span>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <div class="floating-action-btn">
-        @if (TempData["success"] != null)
-        {
-            <form asp-controller="Driver" asp-action="FinishTrip" method="post" class="m-0 p-0 w-100">
-                <input type="hidden" name="tripId" value="1" />
-                <button type="submit" class="btn btn-lg w-100 text-white fw-bold shadow rounded-pill py-3 d-flex justify-content-center align-items-center" style="background-color: #dc3545; border: none; font-size: 1.2rem; transition: transform 0.2s;">
-                    <i class="bi bi-stop-circle-fill me-2 fs-3"></i> Завершити рейс
-                </button>
-            </form>
-        }
-        else
-        {
-            <form asp-controller="Driver" asp-action="StartTrip" method="post" class="m-0 p-0 w-100">
-                <input type="hidden" name="tripId" value="1" />
-                <button type="submit" class="btn btn-lg w-100 text-white fw-bold shadow rounded-pill py-3 d-flex justify-content-center align-items-center" style="background-color: #198754; border: none; font-size: 1.2rem; transition: transform 0.2s;">
-                    <i class="bi bi-play-circle-fill me-2 fs-3"></i> Почати рейс
-                </button>
-            </form>
-        }
-    </div>
+    }
 </div>

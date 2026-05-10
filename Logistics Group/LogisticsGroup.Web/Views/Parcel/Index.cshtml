@@ -1,0 +1,172 @@
+﻿@model IEnumerable<LogisticsGroup.Domain.Entities.Parcel>
+@{
+    ViewData["Title"] = "Віртуальний склад";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-danger fw-bold"><i class="bi bi-box-seam"></i> Віртуальний склад</h2>
+
+    <div>
+        <form asp-action="GenerateTestData" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-outline-primary rounded-pill px-3 me-2">
+                <i class="bi bi-lightning-charge"></i> Згенерувати 10 посилок
+            </button>
+        </form>
+
+        <a asp-action="Create" class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-lg"></i> Нова посилка
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body bg-light rounded-4">
+        <form method="get" asp-action="Index" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-muted small"><i class="bi bi-geo-alt"></i> Звідки (Місто відправки):</label>
+                <select name="fromCityId" class="form-select shadow-sm" asp-items="ViewBag.FromCities">
+                    <option value="">-- Всі міста --</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-muted small"><i class="bi bi-geo"></i> Куди (Місто призначення):</label>
+                <select name="toCityId" class="form-select shadow-sm" asp-items="ViewBag.ToCities">
+                    <option value="">-- Всі міста --</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary shadow-sm flex-grow-1">
+                    <i class="bi bi-search"></i> Шукати вантаж
+                </button>
+                @if (!string.IsNullOrEmpty(Context.Request.Query["fromCityId"]) || !string.IsNullOrEmpty(Context.Request.Query["toCityId"]))
+                {
+                        <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
+                            Скинути
+                        </a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card border-primary border-start border-5 shadow-sm rounded-3">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-1">Готово до завантаження</h6>
+                    <h3 class="fw-bold mb-0 text-primary">@ViewBag.TotalCount <span class="fs-6 text-muted fw-normal">посилок</span></h3>
+                </div>
+                <i class="bi bi-boxes fs-1 text-primary opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-warning border-start border-5 shadow-sm rounded-3">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-1">Загальна вага вантажу</h6>
+                    <h3 class="fw-bold mb-0 text-warning">@ViewBag.TotalWeight <span class="fs-6 text-muted fw-normal">кг</span></h3>
+                </div>
+                <i class="bi bi-speedometer fs-1 text-warning opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 text-muted">Список посилок до відправлення</h5>
+    </div>
+    <div class="card-body p-0">
+        <form asp-controller="Flight" asp-action="PrepareFlight" method="get">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4" style="width: 40px;">
+                                <input type="checkbox" class="form-check-input" id="selectAll">
+                            </th>
+                            <th>ТТН</th>
+                            <th>Звідки</th>
+                            <th>Куди</th>
+                            <th>Вага</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">За даним маршрутом посилок не знайдено.</td>
+                                </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <input type="checkbox" name="selectedParcels" value="@item.Id" class="form-check-input parcel-checkbox">
+                                            </td>
+                                            <td class="fw-bold">@item.Barcode</td>
+                                            <td>
+                                                <span class="text-muted small">
+                                                    <i class="bi bi-arrow-up-right text-secondary"></i> @item.SenderBranch?.City?.Name
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info text-dark">
+                                                    <i class="bi bi-geo-alt"></i> @item.ReceiverBranch?.City?.Name
+                                                </span>
+                                            </td>
+                                            <td>@item.Weight кг</td>
+                                            <td>
+                                                <span class="badge bg-warning text-dark px-3">@item.Status</span>
+                                            </td>
+                                        </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-3 bg-light border-top d-flex justify-content-end">
+                <button type="submit" id="createFlightBtn" class="btn btn-success fw-bold rounded-pill px-5 shadow" disabled>
+                    Сформувати рейс із вибраних (<span id="selectedCount">0</span>)
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+        <script>
+            const checkboxes = document.querySelectorAll('.parcel-checkbox');
+            const btn = document.getElementById('createFlightBtn');
+            const countSpan = document.getElementById('selectedCount');
+            const selectAllCheckbox = document.getElementById('selectAll');
+
+            // Функція для оновлення лічильника і стану кнопки
+            function updateSelection() {
+                const checkedCount = document.querySelectorAll('.parcel-checkbox:checked').length;
+                countSpan.innerText = checkedCount;
+                btn.disabled = checkedCount === 0;
+            }
+
+            // Слухаємо кліки по окремих чекбоксах
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateSelection);
+            });
+
+            // Слухаємо клік по чекбоксу "Вибрати всі"
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelection();
+                });
+            }
+        </script>
+}
