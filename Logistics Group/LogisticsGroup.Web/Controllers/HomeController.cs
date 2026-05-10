@@ -1,32 +1,49 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using LogisticsGroup.Web.Models;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using LogisticsGroup.Infrastructure.Data; // Перевір, чи правильний тут namespace до ApplicationDbContext
 
-namespace LogisticsGroup.Web.Controllers;
-[AllowAnonymous]
-public class HomeController : Controller
+namespace LogisticsGroup.Web.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController : Controller
     {
-        _logger = logger;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public HomeController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+        // Метод приймає параметр ttn з рядка пошуку
+        public async Task<IActionResult> Index(string ttn)
+        {
+            if (!string.IsNullOrEmpty(ttn))
+            {
+                ViewBag.SearchTerm = ttn;
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                // Витягуємо тільки цифри (якщо користувач ввів "TTN-15", беремо "15")
+                var idString = ttn.ToUpper().Replace("TTN-", "").Trim();
+
+                if (int.TryParse(idString, out int parcelId))
+                {
+                    // Шукаємо посилку в базі
+                    var parcel = await _context.Parcels.FirstOrDefaultAsync(p => p.Id == parcelId);
+
+                    if (parcel != null)
+                    {
+                        ViewBag.TrackedParcel = parcel; // Передаємо знайдену посилку у View
+                    }
+                    else
+                    {
+                        ViewBag.Error = "Посилку з таким номером не знайдено. Перевірте правильність ТТН.";
+                    }
+                }
+                else
+                {
+                    ViewBag.Error = "Неправильний формат номеру. Використовуйте формат, наприклад: TTN-1";
+                }
+            }
+
+            return View();
+        }
     }
 }

@@ -7,15 +7,15 @@
     .hero-section {
         background: linear-gradient(135deg, #ed3237 0%, #a61216 100%);
         color: white;
-        padding: 5rem 0 8rem 0; /* Збільшений відступ знизу */
+        padding: 5rem 0 10rem 0; /* Збільшили нижній відступ, щоб вліз пошук */
         border-radius: 0 0 40px 40px;
         box-shadow: 0 10px 30px rgba(237, 50, 55, 0.2);
-        margin-top: -16px; /* Щоб прибрати білу смугу під меню, якщо вона є */
+        margin-top: -16px;
     }
 
     /* Ефект "наповзання" карток на червоний фон */
     .overlap-cards {
-        margin-top: -5rem;
+        margin-top: -6rem; /* Трохи підняли, щоб гарно лягало під результат пошуку */
         position: relative;
         z-index: 10;
     }
@@ -27,17 +27,17 @@
         border-radius: 20px;
         background: #ffffff;
     }
-    
-        .hover-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
-        }
+
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
+    }
 
     /* Стильні квадрати для іконок */
     .icon-wrapper {
         width: 80px;
         height: 80px;
-        background-color: rgba(237, 50, 55, 0.08); /* Напівпрозорий червоний */
+        background-color: rgba(237, 50, 55, 0.08);
         color: #ed3237;
         border-radius: 20px;
         display: flex;
@@ -48,7 +48,6 @@
         transition: all 0.4s ease;
     }
 
-    /* При наведенні мишки іконка заливається червоним, а сама фігурка стає білою */
     .hover-card:hover .icon-wrapper {
         background-color: #ed3237;
         color: white;
@@ -59,15 +58,74 @@
 <div class="hero-section text-center">
     <div class="container">
         <h1 class="display-4 fw-bolder mb-3">Logistics Group</h1>
-        <p class="lead mx-auto" style="max-width: 600px; color: rgba(255,255,255,0.85);">
+        <p class="lead mx-auto mb-5" style="max-width: 600px; color: rgba(255,255,255,0.85);">
             Сучасна система управління логістичними процесами, автопарком та персоналом рівня Enterprise.
         </p>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <form asp-action="Index" method="get" class="d-flex bg-white p-2 rounded-pill shadow-lg">
+                    <input type="text" name="ttn" class="form-control border-0 rounded-pill px-4 fs-5" 
+                           placeholder="Введіть номер ТТН..." value="@ViewBag.SearchedTTN" required 
+                           style="box-shadow: none; outline: none;">
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold fs-5">Відстежити</button>
+                </form>
+            </div>
+        </div>
+
+        @if (ViewBag.SearchedTTN != null)
+        {
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-8 col-lg-6">
+                        <div class="card border-0 shadow rounded-4 text-dark text-start">
+                            <div class="card-body p-4">
+                            @if (ViewBag.Parcel != null)
+                            {
+                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                            <h5 class="fw-bold mb-0 text-danger"><i class="bi bi-box-seam me-2"></i>Посилку знайдено!</h5>
+                                            <span class="badge bg-danger rounded-pill fs-6">@ViewBag.Parcel.Status</span>
+                                        </div>
+
+                                        <div class="row text-center mb-3">
+                                            <div class="col-5">
+                                                <p class="text-muted mb-1 small">Відправлення</p>
+                                                <h6 class="fw-bold mb-0">@ViewBag.Parcel.SenderBranch.City.Name</h6>
+                                                <small class="text-muted">Відділення №@ViewBag.Parcel.SenderBranch.Number</small>
+                                            </div>
+                                            <div class="col-2 d-flex align-items-center justify-content-center text-danger">
+                                                <i class="bi bi-arrow-right-circle-fill fs-3"></i>
+                                            </div>
+                                            <div class="col-5">
+                                                <p class="text-muted mb-1 small">Призначення</p>
+                                                <h6 class="fw-bold mb-0">@ViewBag.Parcel.ReceiverBranch.City.Name</h6>
+                                                <small class="text-muted">Відділення №@ViewBag.Parcel.ReceiverBranch.Number</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="bg-light p-3 rounded-3 text-center">
+                                            <span class="text-muted">ТТН:</span> <strong>@ViewBag.Parcel.Barcode</strong> | 
+                                            <span class="text-muted">Вага:</span> <strong>@ViewBag.Parcel.Weight кг</strong>
+                                        </div>
+                            }
+                            else
+                            {
+                                        <div class="text-center py-3">
+                                            <i class="bi bi-search text-muted fs-1 mb-2"></i>
+                                            <h5 class="fw-bold">Посилку не знайдено 😢</h5>
+                                            <p class="text-muted mb-0">Перевірте правильність введеного номеру ТТН <strong>@ViewBag.SearchedTTN</strong> та спробуйте ще раз.</p>
+                                        </div>
+                            }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        }
     </div>
 </div>
 
 <div class="container overlap-cards pb-5">
     <div class="row g-4 justify-content-center">
-        
+
         <div class="col-md-4">
             <a asp-controller="City" asp-action="Index" class="text-decoration-none text-dark">
                 <div class="card h-100 shadow-sm hover-card">

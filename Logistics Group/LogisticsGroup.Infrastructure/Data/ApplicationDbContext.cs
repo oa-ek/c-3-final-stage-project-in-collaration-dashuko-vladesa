@@ -21,6 +21,7 @@ namespace LogisticsGroup.Infrastructure.Data
 
         public DbSet<CargoCategory> CargoCategories { get; set; }
         public DbSet<Parcel> Parcels { get; set; }
+        public DbSet<Flight> Flights { get; set; }
 
         public DbSet<Route> Routes { get; set; }
         public DbSet<RoutePoint> RoutePoints { get; set; }
