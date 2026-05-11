@@ -1,0 +1,200 @@
+﻿@model IEnumerable<LogisticsGroup.Domain.Entities.Branch>
+
+<div class="container-fluid mt-4">
+    <h2 class="fw-bold mb-4" style="color: #ed3237;">Створення складного маршруту</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 border-0 rounded-4">
+
+                <div id="routeStops">
+                    <div class="mb-3 stop-item">
+                        <label class="form-label fw-bold text-success">Точка 1 (Завантаження)</label>
+                        <select class="form-select branch-select">
+                            <option value="">Виберіть відділення...</option>
+                            @foreach (var b in Model)
+                            {
+                                    <option value="@b.Id" 
+                                            data-lat="@(b.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))" 
+                                            data-lng="@(b.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                        №@b.Number - @b.Address (@b.City.Name)
+                                    </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3 stop-item">
+                        <label class="form-label fw-bold text-danger">Точка 2 (Вивантаження)</label>
+                        <select class="form-select branch-select">
+                            <option value="">Виберіть відділення...</option>
+                            @foreach (var b in Model)
+                            {
+                                    <option value="@b.Id" 
+                                            data-lat="@(b.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))" 
+                                            data-lng="@(b.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                        №@b.Number - @b.Address (@b.City.Name)
+                                    </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" id="addStopBtn" class="btn btn-outline-secondary w-100 mb-3 fw-bold border-dashed">
+                    <i class="bi bi-plus-circle me-1"></i> Додати зупинку
+                </button>
+
+                <hr>
+                <div id="routeInfo" class="mb-3 d-none p-3 bg-light rounded-3 border">
+                    <p class="mb-1"><strong>Загальна відстань:</strong> <span id="distVal" class="text-primary fs-5">0</span> км</p>
+                    <p class="mb-0"><strong>Час у дорозі:</strong> <span id="timeVal" class="text-primary fs-5">0</span> год</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Назва шаблону</label>
+                    <input type="text" id="routeName" class="form-control" placeholder="Напр: Південний Експрес">
+                </div>
+
+                <button id="saveTemplateBtn" class="btn btn-danger w-100 fw-bold py-2 shadow-sm" style="border-radius: 10px;">
+                    <i class="bi bi-save me-2"></i> Зберегти маршрут
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div id="map" style="height: 650px; border-radius: 15px;" class="shadow-sm border"></div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<style>
+    .border-dashed { border: 2px dashed #ccc !important; }
+    .border-dashed:hover { background-color: #f8f9fa; border-color: #aaa !important; }
+</style>
+
+<script>
+    // 1. Фікс зниклих іконок для маркерів у Leaflet
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+
+    // 2. Ініціалізація карти
+    var map = L.map('map').setView([48.3794, 31.1656], 6); 
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    var control = L.Routing.control({
+        waypoints: [],
+        routeWhileDragging: false,
+        show: false, // ховаємо панель тексту з кроками
+        fitSelectedRoutes: true, // зумування на маршрут
+        lineOptions: {
+            styles: [{ color: '#ed3237', opacity: 0.8, weight: 6 }]
+        }
+    }).addTo(map);
+
+    let routeData = { distance: 0, time: 0 };
+
+    document.getElementById('addStopBtn').addEventListener('click', function() {
+        const container = document.getElementById('routeStops');
+        const stopCount = container.children.length + 1;
+
+        const newStop = container.children[0].cloneNode(true);
+        const label = newStop.querySelector('label');
+        label.innerText = `Точка ${stopCount} (Транзит)`;
+        label.className = 'form-label fw-bold text-warning';
+        newStop.querySelector('select').value = '';
+
+        const previousLastLabel = container.lastElementChild.querySelector('label');
+        previousLastLabel.innerText = `Точка ${stopCount - 1} (Транзит)`;
+        previousLastLabel.className = 'form-label fw-bold text-warning';
+
+        label.innerText = `Точка ${stopCount} (Вивантаження)`;
+        label.className = 'form-label fw-bold text-danger';
+
+        container.appendChild(newStop);
+    });
+
+    document.getElementById('routeStops').addEventListener('change', function(e) {
+        if(e.target.classList.contains('branch-select')) {
+            updateRoute();
+        }
+    });
+
+    function updateRoute() {
+        const selects = document.querySelectorAll('.branch-select');
+        let coords = [];
+        let queryParams = [];
+
+        selects.forEach(s => {
+            if (s.value) { // Тепер s.value - це ID відділення
+                let selectedOption = s.options[s.selectedIndex];
+                let lat = parseFloat(selectedOption.getAttribute('data-lat'));
+                let lng = parseFloat(selectedOption.getAttribute('data-lng'));
+                let id = s.value;
+
+                if(!isNaN(lat) && !isNaN(lng)) {
+                    coords.push(L.latLng(lat, lng));
+                    queryParams.push(`branchIds=${id}`);
+                }
+            }
+        });
+
+        if (coords.length >= 2) {
+            control.setWaypoints(coords); // Малює червону лінію
+
+            fetch(`/Logistician/CalculateRoute?${queryParams.join('&')}`)
+                .then(res => res.ok ? res.json() : Promise.reject("Помилка API"))
+                .then(data => {
+                    routeData.distance = data.distanceKm;
+                    routeData.time = data.timeHours;
+
+                    document.getElementById('routeInfo').classList.remove('d-none');
+                    document.getElementById('distVal').innerText = routeData.distance;
+                    document.getElementById('timeVal').innerText = routeData.time;
+                })
+                .catch(err => console.error("Помилка розрахунку:", err));
+        }
+    }
+
+    document.getElementById('saveTemplateBtn').addEventListener('click', function() {
+        const selects = document.querySelectorAll('.branch-select');
+        let points = [];
+        let sequence = 1;
+
+        selects.forEach((s, index) => {
+            if (s.value) {
+                let id = parseInt(s.value);
+                let opType = index === 0 ? "Завантаження" : (index === selects.length - 1 ? "Вивантаження" : "Транзит");
+                points.push({ BranchId: id, Sequence: sequence++, OperationType: opType });
+            }
+        });
+
+        if (points.length < 2) return alert("Потрібно вказати щонайменше 2 відділення!");
+
+        const data = {
+            Name: document.getElementById('routeName').value || "Маршрут без назви",
+            Distance: parseFloat(routeData.distance),
+            EstimatedTime: parseInt(routeData.time),
+            Points: points
+        };
+
+        fetch('/Logistician/SaveRouteTemplate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            alert(result.message);
+            window.location.reload();
+        })
+        .catch(error => alert('Помилка збереження.'));
+    });
+</script>

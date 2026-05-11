@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/LogisticsGroup.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
             .premium-nav {
@@ -92,11 +94,16 @@
                                         <li class="nav-item">
                                             <a class="nav-link fw-bold text-dark" asp-area="" asp-controller="Flight" asp-action="Index">🚚 Рейси</a>
                                         </li>
-                                        <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                                            <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="CreateStaff">
-                                                <i class="bi bi-plus-lg me-1"></i> Персонал
-                                            </a>
-                                        </li>
+                                            <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+        <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="Index">
+            <i class="bi bi-people-fill me-1"></i> Персонал
+        </a>
+    </li>
+        <li class="nav-item">
+    <a class="nav-link text-danger fw-bold" asp-controller="Branch" asp-action="Map">
+        <i class="bi bi-geo-alt-fill me-1"></i> Карта
+        </a>
+    </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Logistician"))

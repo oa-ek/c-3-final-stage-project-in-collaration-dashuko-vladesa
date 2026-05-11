@@ -4,8 +4,7 @@
     var logisticianName = User.Identity?.Name ?? "Логіст";
 }
 
-<div class="container-fluid mt-4 mb-5">
-
+<div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-0" style="color: #ed3237;">
@@ -13,9 +12,16 @@
             </h2>
             <p class="text-muted mt-1 mb-0">З поверненням, @logisticianName! Ось реальний звіт на сьогодні.</p>
         </div>
-        <a asp-controller="Parcel" asp-action="Index" class="btn text-white fw-bold shadow-sm px-4 py-2" style="background-color: #ed3237; border-radius: 12px;">
-            <i class="bi bi-box-seam me-2"></i> Перейти на склад (Створити рейс)
-        </a>
+
+        <div class="d-flex gap-3">
+            <a asp-controller="Logistician" asp-action="CreateRoute" class="btn text-white fw-bold shadow-sm px-4 py-2" style="background-color: #2b2b2b; border-radius: 12px;">
+                <i class="bi bi-map me-2"></i> Прокласти маршрут
+            </a>
+
+            <a asp-controller="Parcel" asp-action="Index" class="btn text-white fw-bold shadow-sm px-4 py-2" style="background-color: #ed3237; border-radius: 12px;">
+                <i class="bi bi-box-seam me-2"></i> Перейти на склад
+            </a>
+        </div>
     </div>
 
     <div class="row g-4 mb-4">
@@ -97,25 +103,20 @@
                             {
                                         <tr>
                                             <td class="ps-4 py-3 fw-bold text-dark">FLT-@flight.Id</td>
-
                                             <td class="py-3 fw-semibold">
                                                 <i class="bi bi-person-badge text-muted me-1"></i> @flight.Driver?.FullName
                                             </td>
-
                                             <td class="py-3">
                                                 <span class="text-primary fw-bold">@flight.Vehicle?.LicensePlate</span>
                                             </td>
-
                                             <td class="py-3 text-muted">
                                                 <i class="bi bi-box me-1"></i> @flight.Parcels?.Count шт.
                                             </td>
-
                                             <td class="py-3">
                                                 <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm">
                                                     <i class="bi bi-play-circle me-1"></i> @flight.Status
                                                 </span>
                                             </td>
-
                                             <td class="pe-4 py-3 text-end">
                                                 <a asp-controller="Flight" asp-action="Details" asp-route-id="@flight.Id" class="btn btn-sm btn-outline-primary rounded-3 px-3 fw-bold">Деталі</a>
                                             </td>
