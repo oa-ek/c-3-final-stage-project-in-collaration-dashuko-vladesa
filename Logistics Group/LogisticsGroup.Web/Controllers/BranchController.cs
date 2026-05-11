@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
 using ClosedXML.Excel;
+using System.Text.Json;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -16,6 +17,63 @@ namespace LogisticsGroup.Web.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+        // --- ДОПОМІЖНІ МЕТОДИ ---
+
+        // Очищає адресу від "вул.", "буд." та зайвих пробілів для API
+        private string BuildAddressForApi(string cityName, string streetAddress)
+        {
+            var city = string.IsNullOrWhiteSpace(cityName) ? "" : cityName.Trim();
+            var street = string.IsNullOrWhiteSpace(streetAddress) ? "" : streetAddress;
+
+            street = street.Replace("вул.", " ")
+                           .Replace("вулиця", " ")
+                           .Replace("буд.", " ")
+                           .Replace("б.", " ")
+                           .Replace("просп.", " ")
+                           .Replace("проспект", " ")
+                           .Replace("пров.", " ");
+
+            street = System.Text.RegularExpressions.Regex.Replace(street, @"\s+", " ").Trim();
+
+            var query = $"{city}, {street}, Україна";
+            query = query.Replace(" ,", ",");
+
+            return query;
+        }
+
+        private async Task<(double? Lat, double? Lng)> GetCoordinatesFromAddress(string address)
+        {
+            try
+            {
+                using var client = new HttpClient();
+                // Nominatim вимагає User-Agent
+                client.DefaultRequestHeaders.Add("User-Agent", "LogisticsGroupApp/1.0 (admin@novaposhta.com)");
+                var url = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(address)}&format=json&limit=1";
+
+                var response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    using var document = JsonDocument.Parse(json);
+
+                    if (document.RootElement.GetArrayLength() > 0)
+                    {
+                        var firstResult = document.RootElement[0];
+                        var lat = Convert.ToDouble(firstResult.GetProperty("lat").GetString(), System.Globalization.CultureInfo.InvariantCulture);
+                        var lon = Convert.ToDouble(firstResult.GetProperty("lon").GetString(), System.Globalization.CultureInfo.InvariantCulture);
+                        return (lat, lon);
+                    }
+                }
+            }
+            catch
+            {
+                // Ігноруємо помилки мережі
+            }
+            return (null, null);
+        }
+
+        // --- ОСНОВНІ МЕТОДИ КОНТРОЛЕРА ---
 
         public IActionResult Index()
         {
@@ -45,14 +103,24 @@ namespace LogisticsGroup.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Branch obj)
+        public async Task<IActionResult> Create(Branch obj)
         {
             ModelState.Remove("City");
 
             if (ModelState.IsValid)
             {
+                var city = _unitOfWork.City.Get(u => u.Id == obj.CityId);
+                var cityName = city != null ? city.Name : "";
+
+                var fullAddress = BuildAddressForApi(cityName, obj.Address);
+
+                var coords = await GetCoordinatesFromAddress(fullAddress);
+                obj.Latitude = coords.Lat;
+                obj.Longitude = coords.Lng;
+
                 _unitOfWork.Branch.Add(obj);
                 _unitOfWork.Save();
+                TempData["success"] = "Відділення успішно створено!";
                 return RedirectToAction("Index");
             }
 
@@ -86,14 +154,24 @@ namespace LogisticsGroup.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Branch obj)
+        public async Task<IActionResult> Edit(Branch obj)
         {
             ModelState.Remove("City");
 
             if (ModelState.IsValid)
             {
+                var city = _unitOfWork.City.Get(u => u.Id == obj.CityId);
+                var cityName = city != null ? city.Name : "";
+
+                var fullAddress = BuildAddressForApi(cityName, obj.Address);
+
+                var coords = await GetCoordinatesFromAddress(fullAddress);
+                obj.Latitude = coords.Lat;
+                obj.Longitude = coords.Lng;
+
                 _unitOfWork.Branch.Update(obj);
                 _unitOfWork.Save();
+                TempData["success"] = "Відділення успішно оновлено!";
                 return RedirectToAction("Index");
             }
 
@@ -127,6 +205,7 @@ namespace LogisticsGroup.Web.Controllers
             if (obj == null) return NotFound();
             _unitOfWork.Branch.Remove(obj);
             _unitOfWork.Save();
+            TempData["success"] = "Відділення успішно видалено!";
             return RedirectToAction("Index");
         }
 
@@ -178,10 +257,8 @@ namespace LogisticsGroup.Web.Controllers
         {
             if (file != null && file.Length > 0)
             {
-                // МАГІЧНИЙ БЛОК: Шукаємо залізобетонне Місто
                 var validCity = _unitOfWork.City.GetAll().FirstOrDefault();
 
-                // Якщо база зовсім пуста, робимо "рятувальне коло"
                 if (validCity == null)
                 {
                     var validRegion = _unitOfWork.Region.GetAll().FirstOrDefault();
@@ -225,7 +302,6 @@ namespace LogisticsGroup.Web.Controllers
                                 Type = row.Cell(4).GetString(),
                                 WorkingHours = row.Cell(5).GetString(),
                                 MaxWeight = parsedMaxWeight,
-                                // ІГНОРУЄМО EXCEL! Беремо перевірене місто з бази:
                                 CityId = validCity.Id
                             };
 
@@ -234,9 +310,93 @@ namespace LogisticsGroup.Web.Controllers
                         _unitOfWork.Save();
                     }
                 }
-                TempData["success"] = "Відділення та поштомати успішно імпортовано!";
+                TempData["success"] = "Відділення імпортовано! Не забудьте синхронізувати координати на карті.";
             }
             return RedirectToAction("Index");
+        }
+
+        public IActionResult Map()
+        {
+            var branchList = _unitOfWork.Branch.GetAll().ToList();
+            var cityList = _unitOfWork.City.GetAll().ToList();
+
+            foreach (var branch in branchList)
+            {
+                branch.City = cityList.FirstOrDefault(c => c.Id == branch.CityId);
+            }
+
+            return View(branchList);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SyncCoordinates()
+        {
+            var branchList = _unitOfWork.Branch.GetAll().ToList();
+            var cityList = _unitOfWork.City.GetAll().ToList();
+
+            int exactMatches = 0;
+            int cityFallbackMatches = 0;
+            List<string> completelyFailed = new List<string>();
+
+            var branchesToUpdate = branchList.Where(b => b.Latitude == null || b.Longitude == null).ToList();
+
+            foreach (var branch in branchesToUpdate)
+            {
+                var city = cityList.FirstOrDefault(c => c.Id == branch.CityId);
+                var cityName = city != null ? city.Name : "";
+
+                // Спроба 1: Шукаємо повну точну адресу
+                var exactAddress = $"{cityName}, {branch.Address}, Україна";
+                var coords = await GetCoordinatesFromAddress(exactAddress);
+
+                if (coords.Lat.HasValue && coords.Lng.HasValue)
+                {
+                    branch.Latitude = coords.Lat;
+                    branch.Longitude = coords.Lng;
+                    exactMatches++;
+                }
+                else
+                {
+                    await Task.Delay(1500);
+
+                    // Спроба 2: Шукаємо хоча б просто Місто
+                    var cityOnlyAddress = $"{cityName}, Україна";
+                    coords = await GetCoordinatesFromAddress(cityOnlyAddress);
+
+                    if (coords.Lat.HasValue && coords.Lng.HasValue)
+                    {
+                        branch.Latitude = coords.Lat;
+                        branch.Longitude = coords.Lng;
+                        cityFallbackMatches++;
+                    }
+                    else
+                    {
+                        completelyFailed.Add(exactAddress);
+                    }
+                }
+
+                _unitOfWork.Branch.Update(branch);
+                await Task.Delay(1500);
+            }
+
+            if (exactMatches > 0 || cityFallbackMatches > 0)
+            {
+                _unitOfWork.Save();
+                TempData["success"] = $"Синхронізація завершена! Точних адрес знайдено: {exactMatches}. Приблизних (по центру міста): {cityFallbackMatches}.";
+            }
+
+            if (completelyFailed.Any())
+            {
+                var examples = string.Join(" | ", completelyFailed.Take(3));
+                TempData["error"] = $"Не вдалося знайти навіть міст для {completelyFailed.Count} відділень. Перевірте назви населених пунктів: {examples}";
+            }
+            else if (TempData["error"] != null)
+            {
+                TempData["error"] = null;
+            }
+
+            return RedirectToAction("Map");
         }
     }
 }

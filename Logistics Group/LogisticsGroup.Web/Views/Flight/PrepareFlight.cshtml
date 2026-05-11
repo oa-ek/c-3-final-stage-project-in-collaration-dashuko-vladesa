@@ -34,15 +34,23 @@
 
         <div class="card shadow border-0 rounded-4">
             <div class="card-body p-4">
-                <form asp-action="CreateFlight" method="post">
+                <form asp-action="CreateFlight" asp-controller="Flight" method="post">
 
                     @if (ViewBag.SelectedParcelIds != null)
                     {
                         foreach (var id in ViewBag.SelectedParcelIds)
                         {
-                <input type="hidden" name="parcelIds" value="@id" />
+                                    <input type="hidden" name="parcelIds" value="@id" />
                         }
                     }
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-primary">Оберіть Маршрут</label>
+                        <select name="routeId" class="form-select form-select-lg" asp-items="ViewBag.Routes" required>
+                            <option value="">-- Виберіть збережений маршрут --</option>
+                        </select>
+                    </div>
+
                     <div class="mb-4">
                         <label class="form-label fw-bold">Оберіть Транспорт (Фуру)</label>
                         <select name="vehicleId" class="form-select form-select-lg" asp-items="ViewBag.Vehicles" required>
@@ -58,7 +66,7 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg fw-bold rounded-pill">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold rounded-pill shadow-sm">
                             <i class="bi bi-check-circle"></i> Затвердити рейс і відправити
                         </button>
                         <a asp-controller="Logistician" asp-action="Index" class="btn btn-outline-secondary rounded-pill">Скасувати</a>
