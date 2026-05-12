@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LogisticsGroup.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using LogisticsGroup.Infrastructure.Data; // Переконайся, що namespace для ApplicationDbContext вірний
+using LogisticsGroup.Infrastructure.Data;
+using LogisticsGroup.Web.Services; // Підключаємо папку з сервісами API
+using System.Threading.Tasks;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -10,23 +12,24 @@ namespace LogisticsGroup.Web.Controllers
     public class DriverCabinetController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly WeatherApiService _weatherService; // 1. Додаємо сервіс погоди
 
-        public DriverCabinetController(ApplicationDbContext context)
+        // 2. Інжектимо сервіс у конструктор
+        public DriverCabinetController(ApplicationDbContext context, WeatherApiService weatherService)
         {
             _context = context;
+            _weatherService = weatherService;
         }
 
         public async Task<IActionResult> Index()
         {
             var userName = User.Identity?.Name;
 
-            // Шукаємо активний рейс для поточного водія
-            // Для тестування: якщо водія по імені не знайдено, беремо будь-який перший активний рейс
             var flight = await _context.Flights
                 .Include(f => f.Vehicle)
                 .Include(f => f.Driver)
                 .Include(f => f.Parcels)
-                .FirstOrDefaultAsync(f => (f.Driver.FullName == userName || userName == "admin@test.com")
+                .FirstOrDefaultAsync(f => (f.Driver.FullName == userName || userName == "admin@test.com" || userName == "morchuk985.mr@novaposhta.com")
                                           && (f.Status == "Створено" || f.Status == "В дорозі"));
 
             if (flight == null)
@@ -36,6 +39,23 @@ namespace LogisticsGroup.Web.Controllers
                     .Include(f => f.Driver)
                     .Include(f => f.Parcels)
                     .FirstOrDefaultAsync(f => f.Status == "Створено" || f.Status == "В дорозі");
+            }
+
+            // 3. ВИКЛИК ЗОВНІШНЬОГО API (Завдання лабораторної)
+            if (flight != null)
+            {
+                // Симулюємо координати пункту призначення (наприклад, Київ) для демонстрації API
+                var weather = await _weatherService.GetCurrentWeatherAsync(50.4501, 30.5234);
+
+                if (weather != null)
+                {
+                    ViewBag.WeatherTemp = weather.Value.Temp;
+                    ViewBag.WeatherDesc = weather.Value.Description;
+                }
+                else
+                {
+                    ViewBag.WeatherDesc = "Дані недоступні";
+                }
             }
 
             return View(flight);
@@ -56,37 +76,26 @@ namespace LogisticsGroup.Web.Controllers
 
                 if (newStatus == "Доставлено")
                 {
-                    // Рейс завершено: звільняємо водія та авто
                     if (flight.Driver != null) flight.Driver.Status = "Вільний";
                     if (flight.Vehicle != null) flight.Vehicle.Status = "Вільний";
 
-                    // Посилки прибули
                     if (flight.Parcels != null)
                     {
-                        foreach (var parcel in flight.Parcels)
-                        {
-                            parcel.Status = "Прибуло у відділення";
-                        }
+                        foreach (var parcel in flight.Parcels) parcel.Status = "Прибуло у відділення";
                     }
                 }
                 else if (newStatus == "В дорозі")
                 {
-                    // Рейс почався
                     if (flight.Driver != null) flight.Driver.Status = "В рейсі";
                     if (flight.Vehicle != null) flight.Vehicle.Status = "В рейсі";
 
                     if (flight.Parcels != null)
                     {
-                        foreach (var parcel in flight.Parcels)
-                        {
-                            parcel.Status = "В дорозі";
-                        }
+                        foreach (var parcel in flight.Parcels) parcel.Status = "В дорозі";
                     }
                 }
-
                 await _context.SaveChangesAsync();
             }
-
             return RedirectToAction(nameof(Index));
         }
     }

@@ -4,6 +4,11 @@ using LogisticsGroup.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -117,14 +122,26 @@ namespace LogisticsGroup.Web.Controllers
             return View(cityFromDb);
         }
 
+        // --- ВИПРАВЛЕНЕ ВИДАЛЕННЯ ---
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeletePOST(int? id)
         {
             var obj = _unitOfWork.City.Get(u => u.Id == id);
             if (obj == null) return NotFound();
-            _unitOfWork.City.Remove(obj);
-            _unitOfWork.Save();
+
+            try
+            {
+                _unitOfWork.City.Remove(obj);
+                _unitOfWork.Save();
+                TempData["success"] = "Місто успішно видалено!";
+            }
+            catch (Exception)
+            {
+                // Якщо база блокує видалення через відділення, ловимо помилку
+                TempData["error"] = "Неможливо видалити це місто, оскільки до нього прив'язані існуючі відділення!";
+            }
+
             return RedirectToAction("Index");
         }
 
@@ -163,12 +180,16 @@ namespace LogisticsGroup.Web.Controllers
             }
         }
 
+        // --- ВИПРАВЛЕНИЙ ІМПОРТ З EXCEL ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ImportFromExcel(IFormFile file)
         {
             if (file != null && file.Length > 0)
             {
+                int addedCount = 0;
+                int skippedCount = 0;
+
                 using (var stream = new MemoryStream())
                 {
                     file.CopyTo(stream);
@@ -185,6 +206,7 @@ namespace LogisticsGroup.Web.Controllers
 
                             if (regionExists == null)
                             {
+                                skippedCount++; // Регіону немає - пропускаємо місто
                                 continue;
                             }
 
@@ -195,11 +217,20 @@ namespace LogisticsGroup.Web.Controllers
                                 RegionId = excelRegionId
                             };
                             _unitOfWork.City.Add(city);
+                            addedCount++;
                         }
                         _unitOfWork.Save();
                     }
                 }
-                TempData["success"] = "Міста успішно розкидано по правильних областях!";
+
+                if (skippedCount > 0)
+                {
+                    TempData["error"] = $"Додано міст: {addedCount}. Пропущено: {skippedCount} (у файлі вказані неіснуючі ID областей).";
+                }
+                else
+                {
+                    TempData["success"] = $"Успішно імпортовано {addedCount} міст!";
+                }
             }
             return RedirectToAction("Index");
         }

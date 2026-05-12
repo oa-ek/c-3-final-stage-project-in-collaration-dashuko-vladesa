@@ -1,21 +1,27 @@
 ﻿using LogisticsGroup.Domain.Entities;
 using LogisticsGroup.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ClosedXML.Excel;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
+using System.Text.RegularExpressions;
 
 namespace LogisticsGroup.Web.Controllers
 {
-    //[Authorize(Roles = "Admin")]
     public class DriverController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public DriverController(IUnitOfWork unitOfWork)
+        public DriverController(IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -31,15 +37,86 @@ namespace LogisticsGroup.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Driver obj)
+        public async Task<IActionResult> Create(Driver obj)
         {
             if (ModelState.IsValid)
             {
+                obj.Status = "Вільний";
                 _unitOfWork.Driver.Add(obj);
                 _unitOfWork.Save();
+
+                // СТАБІЛЬНА ПОШТА (без рандому)
+                string email = GenerateDriverEmail(obj.FullName);
+                string password = $"Driver_{new Random().Next(1000, 9999)}!";
+
+                var user = new IdentityUser { UserName = email, Email = email };
+                var result = await _userManager.CreateAsync(user, password);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "Driver");
+                    TempData["SuccessMessage"] = $"Водія додано! 🔑 Логін: {email} | Пароль: {password}";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Помилка Identity: " + string.Join(", ", result.Errors.Select(e => e.Description));
+                }
+
                 return RedirectToAction("Index");
             }
             return View(obj);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(int id)
+        {
+            var driver = _unitOfWork.Driver.Get(u => u.Id == id);
+            if (driver == null) return NotFound();
+
+            // Тепер ця функція видасть ТОЙ САМИЙ email, що і при створенні
+            var email = GenerateDriverEmail(driver.FullName);
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = $"Користувача {email} не знайдено. Можливо, він був створений зі старим рандомним логіном.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            string newPassword = $"Reset_{new Random().Next(1000, 9999)}!";
+
+            await _userManager.RemovePasswordAsync(user);
+            var result = await _userManager.AddPasswordAsync(user, newPassword);
+
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessage"] = $"Пароль для {driver.FullName} успішно змінено! 🔑 Новий пароль: {newPassword}";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Помилка скидання: " + string.Join(", ", result.Errors.Select(e => e.Description));
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // СТАБІЛЬНА ГЕНЕРАЦІЯ БЕЗ РАНДОМУ
+        private string GenerateDriverEmail(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName)) return "driver@logistics.com";
+
+            var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string lastName = parts.Length > 0 ? parts[0].ToLower() : "driver";
+
+            string[] ukr = { "а", "б", "в", "г", "ґ", "д", "е", "є", "ж", "з", "и", "і", "ї", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ь", "ю", "я", "'" };
+            string[] eng = { "a", "b", "v", "h", "g", "d", "e", "ye", "zh", "z", "y", "i", "yi", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "", "yu", "ya", "" };
+
+            for (int i = 0; i < ukr.Length; i++) lastName = lastName.Replace(ukr[i], eng[i]);
+
+            lastName = Regex.Replace(lastName, @"[^a-z0-9]", "");
+
+            return $"driver.{lastName}@logistics.com";
         }
 
         public IActionResult Edit(int? id)
@@ -79,49 +156,41 @@ namespace LogisticsGroup.Web.Controllers
             if (obj == null) return NotFound();
             _unitOfWork.Driver.Remove(obj);
             _unitOfWork.Save();
+            TempData["SuccessMessage"] = "Водія успішно видалено.";
             return RedirectToAction("Index");
         }
 
         public IActionResult ExportToExcel()
         {
             var drivers = _unitOfWork.Driver.GetAll();
-
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("Водії");
-                var currentRow = 1;
-
-                worksheet.Cell(currentRow, 1).Value = "ID";
-                worksheet.Cell(currentRow, 2).Value = "ПІБ";
-                worksheet.Cell(currentRow, 3).Value = "Телефон";
-                worksheet.Cell(currentRow, 4).Value = "Номер посвідчення";
-                worksheet.Cell(currentRow, 5).Value = "Статус";
-
+                worksheet.Cell(1, 1).Value = "ID";
+                worksheet.Cell(1, 2).Value = "ПІБ";
+                worksheet.Cell(1, 3).Value = "Телефон";
+                worksheet.Cell(1, 4).Value = "Статус";
                 worksheet.Row(1).Style.Font.Bold = true;
 
-                foreach (var driver in drivers)
+                int row = 2;
+                foreach (var d in drivers)
                 {
-                    currentRow++;
-                    worksheet.Cell(currentRow, 1).Value = driver.Id;
-                    worksheet.Cell(currentRow, 2).Value = driver.FullName;
-                    worksheet.Cell(currentRow, 3).Value = driver.Phone;
-                    worksheet.Cell(currentRow, 4).Value = driver.LicenseNumber;
-                    worksheet.Cell(currentRow, 5).Value = driver.Status;
+                    worksheet.Cell(row, 1).Value = d.Id;
+                    worksheet.Cell(row, 2).Value = d.FullName;
+                    worksheet.Cell(row, 3).Value = d.Phone;
+                    worksheet.Cell(row, 4).Value = d.Status;
+                    row++;
                 }
-
                 worksheet.Columns().AdjustToContents();
-
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
-                    var content = stream.ToArray();
-                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Drivers_List.xlsx");
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Drivers.xlsx");
                 }
             }
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult ImportFromExcel(IFormFile file)
         {
             if (file != null && file.Length > 0)
@@ -131,75 +200,22 @@ namespace LogisticsGroup.Web.Controllers
                     file.CopyTo(stream);
                     using (var workbook = new XLWorkbook(stream))
                     {
-                        var worksheet = workbook.Worksheet(1);
-                        var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
-
+                        var rows = workbook.Worksheet(1).RangeUsed().RowsUsed().Skip(1);
                         foreach (var row in rows)
                         {
-                            var driver = new Driver
+                            _unitOfWork.Driver.Add(new Driver
                             {
                                 FullName = row.Cell(2).GetString(),
                                 Phone = row.Cell(3).GetString(),
-                                LicenseNumber = row.Cell(4).GetString(),
-                                Status = row.Cell(5).GetString()
-                            };
-
-                            _unitOfWork.Driver.Add(driver);
+                                Status = "Вільний"
+                            });
                         }
                         _unitOfWork.Save();
                     }
                 }
-                TempData["SuccessMessage"] = "Водіїв успішно імпортовано!";
+                TempData["SuccessMessage"] = "Дані успішно імпортовано!";
             }
             return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public IActionResult StartTrip(int tripId)
-        {
-            TempData["success"] = "Рейс успішно розпочато! Щасливої дороги.";
-            return Redirect(Request.Headers["Referer"].ToString());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public IActionResult FinishTrip(int tripId)
-        {
-            TempData["info"] = "Рейс успішно завершено! Відмінна робота.";
-            return Redirect(Request.Headers["Referer"].ToString());
-        }
-
-        [AllowAnonymous]
-        public IActionResult ReportFuel()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public IActionResult ReportFuelSubmit(double liters, double price)
-        {
-            TempData["success"] = $"Звіт прийнято! {liters} л. на суму {price} грн надіслано в бухгалтерію.";
-            return RedirectToAction("Index", "DriverCabinet");
-        }
-
-        [AllowAnonymous]
-        public IActionResult ContactDispatcher()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public IActionResult SubmitDispatcherMessage(string subject, string message)
-        {
-            TempData["success"] = $"Повідомлення на тему '{subject}' успішно надіслано диспетчеру!";
-            return RedirectToAction("Index", "DriverCabinet");
         }
     }
 }
