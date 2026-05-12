@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using LogisticsGroup.Web.Services;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -38,8 +37,10 @@ builder.Services.AddControllersWithViews(options =>
         .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
 });
+
 // Додаємо підтримку кешування в пам'яті (Завдання 8)
 builder.Services.AddMemoryCache();
+
 // ЗАВДАННЯ 10: Реєстрація Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -64,6 +65,13 @@ builder.Services.AddHttpClient<IGeocodingApiService, NominatimApiService>(client
     .HandleTransientHttpError()
     .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
+// ---- ТВОЯ ЧАСТИНА: Реєструємо сервіс погоди з Polly (Завдання 7) ----
+builder.Services.AddHttpClient<WeatherApiService>()
+    .AddPolicyHandler(HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+// ----------------------------------------------------------------------
+
 builder.Services.AddRazorPages();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
@@ -84,7 +92,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseStaticFiles();
 app.MapStaticAssets();
 

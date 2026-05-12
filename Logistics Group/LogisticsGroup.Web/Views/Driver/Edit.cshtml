@@ -37,6 +37,20 @@
                         </div>
                         <span asp-validation-for="Phone" class="text-danger small"></span>
                     </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label fw-bold text-dark">Поточний статус <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-lg shadow-sm rounded-3">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-info-circle"></i></span>
+                            <select asp-for="Status" class="form-select border-start-0 ps-0" required>
+                                <option value="">-- Оберіть статус --</option>
+                                <option value="Вільний">🟢 Вільний (Готовий до рейсу)</option>
+                                <option value="В рейсі">🔵 В рейсі</option>
+                                <option value="Лікарняний/Відпустка">🔴 Лікарняний / Відпустка</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
                 </div>
 
                 <hr class="my-5" style="border-color: #e9ecef;">

@@ -46,12 +46,15 @@ namespace LogisticsGroup.Web.Controllers
                 .Where(p => selectedParcels.Contains(p.Id))
                 .ToListAsync();
 
-            // Підтягуємо ТІЛЬКИ вільних водіїв та машини для коректної роботи
-            var availableDrivers = await _context.Drivers.Where(d => d.Status == "Вільний").ToListAsync();
+            // ВИПРАВЛЕНО: Тепер шукаємо ТІЛЬКИ вільних водіїв (містить корінь "Вільн")
+            var availableDrivers = await _context.Drivers
+                .Where(d => d.Status != null && d.Status.Contains("Вільн"))
+                .ToListAsync();
             ViewBag.Drivers = new SelectList(availableDrivers, "Id", "FullName");
 
+            // Залишаємо виправлений пошук машин (розуміє довгі статуси на кшталт "Вільна (Готова до рейсу)")
             var availableVehicles = await _context.Vehicles
-                .Where(v => v.Status == "Вільний" || v.Status == "Готовий")
+                .Where(v => v.Status != null && (v.Status.Contains("Вільн") || v.Status.Contains("Готов")))
                 .Select(v => new
                 {
                     Id = v.Id,
@@ -59,7 +62,7 @@ namespace LogisticsGroup.Web.Controllers
                 }).ToListAsync();
             ViewBag.Vehicles = new SelectList(availableVehicles, "Id", "Info");
 
-            // ДОДАНО: Підтягуємо шаблони маршрутів
+            // Підтягуємо шаблони маршрутів
             var routes = await _context.Routes.Where(r => r.Type == "Template").ToListAsync();
             ViewBag.Routes = new SelectList(routes, "Id", "Name");
 
@@ -68,29 +71,26 @@ namespace LogisticsGroup.Web.Controllers
             return View(parcels);
         }
 
-        // POST: Створення рейсу (Об'єднано з твоїм ConfirmFlight)
+        // POST: Створення рейсу
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateFlight(int vehicleId, int driverId, int routeId, int[] parcelIds)
         {
-            // Знаходимо обраний шаблон маршруту для розрахунку часу
             var routeTemplate = await _context.Routes.FindAsync(routeId);
 
-            // 1. Створюємо рейс
             var flight = new Flight
             {
                 VehicleId = vehicleId,
                 DriverId = driverId,
-                RouteId = routeId, // Прив'язуємо маршрут
+                RouteId = routeId,
                 DepartureDate = DateTime.Now,
-                ArrivalDate = DateTime.Now.AddHours(routeTemplate?.EstimatedTime ?? 0), // Автоматичний розрахунок часу
+                ArrivalDate = DateTime.Now.AddHours(routeTemplate?.EstimatedTime ?? 0),
                 Status = "В дорозі"
             };
 
             _context.Flights.Add(flight);
             await _context.SaveChangesAsync();
 
-            // 2. Оновлюємо статуси посилок
             var parcels = await _context.Parcels.Where(p => parcelIds.Contains(p.Id)).ToListAsync();
             foreach (var parcel in parcels)
             {
@@ -98,8 +98,8 @@ namespace LogisticsGroup.Web.Controllers
                 parcel.Status = "В дорозі";
             }
 
-            // 3. Оновлюємо статуси авто та водія, щоб статистика на дашборді була правильною!
             var vehicle = await _context.Vehicles.FindAsync(vehicleId);
+            // Для сумісності з твоїми випадаючими списками ставимо статус:
             if (vehicle != null) vehicle.Status = "В рейсі";
 
             var driver = await _context.Drivers.FindAsync(driverId);
@@ -109,7 +109,6 @@ namespace LogisticsGroup.Web.Controllers
 
             TempData["SuccessMessage"] = $"Рейс успішно сформовано! Номер рейсу: FLT-{flight.Id}";
 
-            // Перекидаємо логіста на дашборд
             return RedirectToAction("Index", "Logistician");
         }
 
@@ -122,7 +121,7 @@ namespace LogisticsGroup.Web.Controllers
             var flight = await _context.Flights
                 .Include(f => f.Driver)
                 .Include(f => f.Vehicle)
-                .Include(f => f.Route) // Обов'язково підтягуємо маршрут
+                .Include(f => f.Route)
                 .Include(f => f.Parcels)
                     .ThenInclude(p => p.ReceiverBranch)
                         .ThenInclude(b => b.City)
