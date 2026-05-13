@@ -17,50 +17,56 @@
             <h2 class="fw-bold"><i class="bi bi-geo-alt-fill text-danger me-2"></i> Мережа відділень</h2>
             @if (TempData["error"] != null)
             {
-        <div class="alert alert-danger alert-dismissible fade show mt-3 mb-3 fw-bold" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div class="alert alert-danger alert-dismissible fade show mt-3 mb-3 fw-bold" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     @TempData["error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
             }
-            <p class="text-muted mb-0">Аналітична панель адміністратора просторових даних</p>
+            <p class="text-muted mb-0">Аналітична панель просторових даних</p>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill fw-bold">
-            <i class="bi bi-list-ul me-1"></i> До списку
-        </a>
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill fw-bold">
+                    <i class="bi bi-list-ul me-1"></i> До списку
+                </a>
+        }
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <div class="card bg-white border-0 shadow-sm rounded-3 p-3 border-start border-4 border-primary">
-                <h6 class="text-muted mb-1">Всього відділень</h6>
-                <h4 class="fw-bold mb-0">@totalBranches</h4>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-white border-0 shadow-sm rounded-3 p-3 border-start border-4 border-success">
-                <h6 class="text-muted mb-1">Відображено на карті</h6>
-                <h4 class="fw-bold mb-0 text-success">@branchesWithCoords</h4>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-white border-0 shadow-sm rounded-3 p-3 border-start border-4 border-warning">
-                <h6 class="text-muted mb-1">Потребують координат</h6>
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="fw-bold mb-0 text-warning">@branchesWithoutCoords</h4>
-                    @if (branchesWithoutCoords > 0)
-                    {
-                            <form asp-action="SyncCoordinates" method="post">
-                                <button type="submit" class="btn btn-sm btn-warning rounded-pill fw-bold" title="Автоматично знайти координати в інтернеті">
-                                    <i class="bi bi-magic me-1"></i> Знайти
-                                </button>
-                            </form>
-                    }
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="card bg-white border-0 shadow-sm rounded-3 p-3 border-start border-4 border-primary">
+                        <h6 class="text-muted mb-1">Всього відділень</h6>
+                        <h4 class="fw-bold mb-0">@totalBranches</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-white border-0 shadow-sm rounded-3 p-3 border-start border-4 border-success">
+                        <h6 class="text-muted mb-1">Відображено на карті</h6>
+                        <h4 class="fw-bold mb-0 text-success">@branchesWithCoords</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-white border-0 shadow-sm rounded-3 p-3 border-start border-4 border-warning">
+                        <h6 class="text-muted mb-1">Потребують координат</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="fw-bold mb-0 text-warning">@branchesWithoutCoords</h4>
+                        @if (branchesWithoutCoords > 0)
+                        {
+                                    <form asp-action="SyncCoordinates" method="post">
+                                        <button type="submit" class="btn btn-sm btn-warning rounded-pill fw-bold" title="Автоматично знайти координати в інтернеті">
+                                            <i class="bi bi-magic me-1"></i> Знайти
+                                        </button>
+                                    </form>
+                        }
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
+    }
     <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-5">
         <div id="map" style="height: 600px; width: 100%; z-index: 1;"></div>
     </div>
@@ -85,7 +91,6 @@
                 shadowSize: [41, 41]
             });
 
-            // Створюємо групу для кластерів
             var markers = L.markerClusterGroup({
                 chunkedLoading: true,
                 maxClusterRadius: 50
@@ -98,38 +103,42 @@
             var lng = branch.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             <text>
-                    var marker = L.marker([@lat, @lng], { icon: redIcon })
-                        .bindPopup(`
-                            <div style="min-width: 220px;">
-                                <h6 class="text-danger fw-bold mb-2 border-bottom pb-1">
-                                    <i class="bi bi-box-seam"></i> Відділення №@branch.Number
-                                </h6>
-                                <p class="mb-1 small"><strong>📍 Місто:</strong> @(branch.City?.Name ?? "Не вказано")</p>
-                                <p class="mb-1 small"><strong>🏠 Адреса:</strong> @branch.Address</p>
-                                <p class="mb-1 small"><strong>📦 Тип:</strong> @branch.Type</p>
-                                ${'@branch.MaxWeight' ? `<p class="mb-1 small"><strong>⚖️ До:</strong> @branch.MaxWeight кг</p>` : ''}
-                                ${'@branch.WorkingHours' ? `<div class="mt-2 bg-light p-1 rounded small text-center"><i class="bi bi-clock text-primary"></i> @branch.WorkingHours</div>` : ''}
-                            </div>
-                        `);
-                    markers.addLayer(marker);
+                        var marker = L.marker([@lat, @lng], { icon: redIcon })
+                            .bindPopup(`
+                                <div style="min-width: 220px;">
+                                    <h6 class="text-danger fw-bold mb-2 border-bottom pb-1">
+                                        <i class="bi bi-box-seam"></i> Відділення №@branch.Number
+                                    </h6>
+                                    <p class="mb-1 small"><strong>📍 Місто:</strong> @(branch.City?.Name ?? "Не вказано")</p>
+                                    <p class="mb-1 small"><strong>🏠 Адреса:</strong> @branch.Address</p>
+                                    <p class="mb-1 small"><strong>📦 Тип:</strong> @branch.Type</p>
+                                    ${'@branch.MaxWeight' ? `<p class="mb-1 small"><strong>⚖️ До:</strong> @branch.MaxWeight кг</p>` : ''}
+                                    ${'@branch.WorkingHours' ? `<div class="mt-2 bg-light p-1 rounded small text-center"><i class="bi bi-clock text-primary"></i> @branch.WorkingHours</div>` : ''}
+                                </div>
+                            `);
+                        markers.addLayer(marker);
             </text>
         }
 
             map.addLayer(markers);
 
-            // ІНСТРУМЕНТ АДМІНА: Клік по карті для отримання координат
-            var popup = L.popup();
-            map.on('click', function(e) {
-                popup
-                    .setLatLng(e.latlng)
-                    .setContent(`
-                        <div class="text-center">
-                            <strong class="d-block mb-1">Координати для копіювання:</strong>
-                            <code class="d-block bg-light p-1 rounded mb-2">${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}</code>
-                            <small class="text-muted">Вставте ці дані в базу для нових відділень.</small>
-                        </div>
-                    `)
-                    .openOn(map);
-            });
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <text>
+                    var popup = L.popup();
+                    map.on('click', function(e) {
+                        popup
+                            .setLatLng(e.latlng)
+                            .setContent(`
+                                <div class="text-center">
+                                    <strong class="d-block mb-1">Координати для копіювання:</strong>
+                                    <code class="d-block bg-light p-1 rounded mb-2">${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}</code>
+                                    <small class="text-muted">Вставте ці дані в базу для нових відділень.</small>
+                                </div>
+                            `)
+                            .openOn(map);
+                    });
+            </text>
+        }
         </script>
 }
