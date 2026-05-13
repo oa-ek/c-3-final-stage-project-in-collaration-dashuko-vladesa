@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LogisticsGroup.Infrastructure.Data; // ѕерев≥р, чи правильний тут namespace до ApplicationDbContext
+using LogisticsGroup.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LogisticsGroup.Web.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -13,24 +15,26 @@ namespace LogisticsGroup.Web.Controllers
             _context = context;
         }
 
-        // ћетод приймаЇ параметр ttn з р€дка пошуку
         public async Task<IActionResult> Index(string ttn)
         {
             if (!string.IsNullOrEmpty(ttn))
             {
                 ViewBag.SearchTerm = ttn;
 
-                // ¬ит€гуЇмо т≥льки цифри (€кщо користувач вв≥в "TTN-15", беремо "15")
                 var idString = ttn.ToUpper().Replace("TTN-", "").Trim();
 
                 if (int.TryParse(idString, out int parcelId))
                 {
-                    // ЎукаЇмо посилку в баз≥
-                    var parcel = await _context.Parcels.FirstOrDefaultAsync(p => p.Id == parcelId);
+                    var parcel = await _context.Parcels
+                        .Include(p => p.SenderBranch)
+                            .ThenInclude(b => b.City)
+                        .Include(p => p.ReceiverBranch)
+                            .ThenInclude(b => b.City)
+                        .FirstOrDefaultAsync(p => p.Id == parcelId);
 
                     if (parcel != null)
                     {
-                        ViewBag.TrackedParcel = parcel; // ѕередаЇмо знайдену посилку у View
+                        ViewBag.TrackedParcel = parcel;
                     }
                     else
                     {
