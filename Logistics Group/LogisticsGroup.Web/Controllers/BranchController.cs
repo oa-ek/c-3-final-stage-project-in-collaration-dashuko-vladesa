@@ -303,7 +303,7 @@ namespace LogisticsGroup.Web.Controllers
             }
             return RedirectToAction("Index");
         }
-
+        [AllowAnonymous]
         public IActionResult Map()
         {
             var branchList = _unitOfWork.Branch.GetAll().ToList();

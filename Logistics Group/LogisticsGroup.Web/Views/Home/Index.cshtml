@@ -3,24 +3,21 @@
 }
 
 <style>
-    /* Преміальний червоний градієнт для шапки сайту */
     .hero-section {
         background: linear-gradient(135deg, #ed3237 0%, #a61216 100%);
         color: white;
-        padding: 5rem 0 10rem 0; /* Збільшили нижній відступ, щоб вліз пошук */
+        padding: 5rem 0 10rem 0; 
         border-radius: 0 0 40px 40px;
         box-shadow: 0 10px 30px rgba(237, 50, 55, 0.2);
         margin-top: -16px;
     }
 
-    /* Ефект "наповзання" карток на червоний фон */
     .overlap-cards {
-        margin-top: -6rem; /* Трохи підняли, щоб гарно лягало під результат пошуку */
+        margin-top: -6rem; 
         position: relative;
         z-index: 10;
     }
 
-    /* Сучасні картки */
     .hover-card {
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         border: none;
@@ -28,12 +25,11 @@
         background: #ffffff;
     }
 
-        .hover-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
-        }
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
+    }
 
-    /* Стильні квадрати для іконок */
     .icon-wrapper {
         width: 80px;
         height: 80px;
@@ -68,120 +64,136 @@
             </a>
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <form asp-action="Index" method="get" class="d-flex bg-white p-2 rounded-pill shadow-lg">
-                    <input type="text" name="ttn" class="form-control border-0 rounded-pill px-4 fs-5"
-                           placeholder="Введіть номер ТТН..." value="@ViewBag.SearchTerm" required
-                           style="box-shadow: none; outline: none;">
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold fs-5">Відстежити</button>
-                </form>
-            </div>
-        </div>
-
-        @if (ViewBag.SearchTerm != null)
+        @* БЛОК ДЛЯ ГОСТЕЙ (НЕ АВТОРИЗОВАНИХ) *@
+        @if (!User.Identity.IsAuthenticated)
         {
-                <div class="row justify-content-center mt-4">
+                <div class="row justify-content-center">
                     <div class="col-md-8 col-lg-6">
-                        <div class="card border-0 shadow rounded-4 text-dark text-start">
-                            <div class="card-body p-4">
-                            @if (ViewBag.TrackedParcel != null)
-                            {
-                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                                            <h5 class="fw-bold mb-0 text-danger"><i class="bi bi-box-seam me-2"></i>Посилку знайдено!</h5>
-                                            <span class="badge bg-danger rounded-pill fs-6">@ViewBag.TrackedParcel.Status</span>
-                                        </div>
-
-                                        <div class="row text-center mb-3">
-                                            <div class="col-5">
-                                                <p class="text-muted mb-1 small">Відправлення</p>
-                                                <h6 class="fw-bold mb-0">@ViewBag.TrackedParcel.SenderBranch.City.Name</h6>
-                                                <small class="text-muted">Відділення №@ViewBag.TrackedParcel.SenderBranch.Number</small>
-                                            </div>
-                                            <div class="col-2 d-flex align-items-center justify-content-center text-danger">
-                                                <i class="bi bi-arrow-right-circle-fill fs-3"></i>
-                                            </div>
-                                            <div class="col-5">
-                                                <p class="text-muted mb-1 small">Призначення</p>
-                                                <h6 class="fw-bold mb-0">@ViewBag.TrackedParcel.ReceiverBranch.City.Name</h6>
-                                                <small class="text-muted">Відділення №@ViewBag.TrackedParcel.ReceiverBranch.Number</small>
-                                            </div>
-                                        </div>
-
-                                        <div class="bg-light p-3 rounded-3 text-center">
-                                            <span class="text-muted">ТТН:</span> <strong>@ViewBag.TrackedParcel.Barcode</strong> |
-                                            <span class="text-muted">Вага:</span> <strong>@ViewBag.TrackedParcel.Weight кг</strong>
-                                        </div>
-                            }
-                            else
-                            {
-                                        <div class="text-center py-3">
-                                            <i class="bi bi-search text-muted fs-1 mb-2"></i>
-                                            <h5 class="fw-bold">Посилку не знайдено 😢</h5>
-                                            <p class="text-muted mb-0">@ViewBag.Error</p>
-                                        </div>
-                            }
-                            </div>
-                        </div>
+                        <form asp-action="Index" method="get" class="d-flex bg-white p-2 rounded-pill shadow-lg">
+                            <input type="text" name="ttn" class="form-control border-0 rounded-pill px-4 fs-5"
+                                   placeholder="Введіть номер ТТН..." value="@ViewBag.SearchTerm" required
+                                   style="box-shadow: none; outline: none;">
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold fs-5">Відстежити</button>
+                        </form>
                     </div>
                 </div>
+
+            @if (ViewBag.SearchTerm != null)
+            {
+                        <div class="row justify-content-center mt-4">
+                            <div class="col-md-8 col-lg-6">
+                                <div class="card border-0 shadow rounded-4 text-dark text-start">
+                                    <div class="card-body p-4">
+                                @if (ViewBag.TrackedParcel != null)
+                                {
+                                                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                                    <h5 class="fw-bold mb-0 text-danger"><i class="bi bi-box-seam me-2"></i>Посилку знайдено!</h5>
+                                                    <span class="badge bg-danger rounded-pill fs-6">@ViewBag.TrackedParcel.Status</span>
+                                                </div>
+
+                                                <div class="row text-center mb-3">
+                                                    <div class="col-5">
+                                                        <p class="text-muted mb-1 small">Відправлення</p>
+                                                        <h6 class="fw-bold mb-0">@ViewBag.TrackedParcel.SenderBranch.City.Name</h6>
+                                                        <small class="text-muted">Відділення №@ViewBag.TrackedParcel.SenderBranch.Number</small>
+                                                    </div>
+                                                    <div class="col-2 d-flex align-items-center justify-content-center text-danger">
+                                                        <i class="bi bi-arrow-right-circle-fill fs-3"></i>
+                                                    </div>
+                                                    <div class="col-5">
+                                                        <p class="text-muted mb-1 small">Призначення</p>
+                                                        <h6 class="fw-bold mb-0">@ViewBag.TrackedParcel.ReceiverBranch.City.Name</h6>
+                                                        <small class="text-muted">Відділення №@ViewBag.TrackedParcel.ReceiverBranch.Number</small>
+                                                    </div>
+                                                </div>
+
+                                                <div class="bg-light p-3 rounded-3 text-center">
+                                                    <span class="text-muted">ТТН:</span> <strong>@ViewBag.TrackedParcel.Barcode</strong> |
+                                                    <span class="text-muted">Вага:</span> <strong>@ViewBag.TrackedParcel.Weight кг</strong>
+                                                </div>
+                                }
+                                else
+                                {
+                                                <div class="text-center py-3">
+                                                    <i class="bi bi-search text-muted fs-1 mb-2"></i>
+                                                    <h5 class="fw-bold">Посилку не знайдено 😢</h5>
+                                                    <p class="text-muted mb-0">@ViewBag.Error</p>
+                                                </div>
+                                }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            }
+        }
+        else
+        {
+                <h3 class="mt-4" style="color: rgba(255,255,255,0.9);">
+                    <i class="bi bi-person-check-fill me-2"></i> Робоча панель співробітника
+                </h3>
         }
     </div>
 </div>
 
-<div class="container overlap-cards pb-5">
-    <div class="row g-4 justify-content-center">
-
-        <div class="col-md-4">
-            <a asp-controller="City" asp-action="Index" class="text-decoration-none text-dark">
-                <div class="card h-100 shadow-sm hover-card">
-                    <div class="card-body text-center p-5">
-                        <div class="icon-wrapper">
-                            <i class="bi bi-geo-alt-fill"></i>
+@* БЛОК ТІЛЬКИ ДЛЯ АВТОРИЗОВАНИХ (КАРТКИ) *@
+@if (User.Identity.IsAuthenticated)
+{
+        <div class="container overlap-cards pb-5">
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <a asp-controller="City" asp-action="Index" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <div class="card-body text-center p-5">
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <h4 class="card-title fw-bold">Інфраструктура</h4>
+                                <p class="card-text text-muted">Керування областями, містами та мережею відділень.</p>
+                                <div class="mt-4 text-danger fw-bold" style="font-size: 0.9rem;">
+                                    Відкрити базу <i class="bi bi-arrow-right ms-1"></i>
+                                </div>
+                            </div>
                         </div>
-                        <h4 class="card-title fw-bold">Інфраструктура</h4>
-                        <p class="card-text text-muted">Керування областями, містами та мережею відділень.</p>
-                        <div class="mt-4 text-danger fw-bold" style="font-size: 0.9rem;">
-                            Відкрити базу <i class="bi bi-arrow-right ms-1"></i>
-                        </div>
-                    </div>
+                    </a>
                 </div>
-            </a>
-        </div>
 
-        <div class="col-md-4">
-            <a asp-controller="Vehicle" asp-action="Index" class="text-decoration-none text-dark">
-                <div class="card h-100 shadow-sm hover-card">
-                    <div class="card-body text-center p-5">
-                        <div class="icon-wrapper">
-                            <i class="bi bi-truck"></i>
+                <div class="col-md-4">
+                    <a asp-controller="Vehicle" asp-action="Index" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <div class="card-body text-center p-5">
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-truck"></i>
+                                </div>
+                                <h4 class="card-title fw-bold">Автопарк</h4>
+                                <p class="card-text text-muted">Контроль транспортних засобів, категорій вантажів та водіїв.</p>
+                                <div class="mt-4 text-danger fw-bold" style="font-size: 0.9rem;">
+                                    Керувати авто <i class="bi bi-arrow-right ms-1"></i>
+                                </div>
+                            </div>
                         </div>
-                        <h4 class="card-title fw-bold">Автопарк</h4>
-                        <p class="card-text text-muted">Контроль транспортних засобів, категорій вантажів та водіїв.</p>
-                        <div class="mt-4 text-danger fw-bold" style="font-size: 0.9rem;">
-                            Керувати авто <i class="bi bi-arrow-right ms-1"></i>
-                        </div>
-                    </div>
+                    </a>
                 </div>
-            </a>
-        </div>
 
-        <div class="col-md-4">
-            <a asp-controller="Logistician" asp-action="Index" class="text-decoration-none text-dark">
-                <div class="card h-100 shadow-sm hover-card">
-                    <div class="card-body text-center p-5">
-                        <div class="icon-wrapper">
-                            <i class="bi bi-radar"></i>
+                <div class="col-md-4">
+                    <a asp-controller="Logistician" asp-action="Index" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <div class="card-body text-center p-5">
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-radar"></i>
+                                </div>
+                                <h4 class="card-title fw-bold">Диспетчеризація</h4>
+                                <p class="card-text text-muted">Моніторинг рейсів та відстеження робочого часу (Тахограф).</p>
+                                <div class="mt-4 text-danger fw-bold" style="font-size: 0.9rem;">
+                                    Пульт логіста <i class="bi bi-arrow-right ms-1"></i>
+                                </div>
+                            </div>
                         </div>
-                        <h4 class="card-title fw-bold">Диспетчеризація</h4>
-                        <p class="card-text text-muted">Моніторинг рейсів та відстеження робочого часу (Тахограф).</p>
-                        <div class="mt-4 text-danger fw-bold" style="font-size: 0.9rem;">
-                            Пульт логіста <i class="bi bi-arrow-right ms-1"></i>
-                        </div>
-                    </div>
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
-
-    </div>
-</div>
+}
+else
+{
+        <div style="height: 60px;"></div>
+}
