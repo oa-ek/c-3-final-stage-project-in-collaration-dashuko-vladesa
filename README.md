@@ -32,5 +32,5 @@
 3. Додати дійсний API ключ для маршрутизації:
    ```json
    "ApiKeys": {
-     "OpenRouteService": "ВАШ_КЛЮЧ_ТУТ"
+     "OpenRouteService": "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjZiMzQ0YzZhYTk1MDRlMDhiMGU4MTkwN2VlNzViMDIwIiwiaCI6Im11cm11cjY0In0"
    }
