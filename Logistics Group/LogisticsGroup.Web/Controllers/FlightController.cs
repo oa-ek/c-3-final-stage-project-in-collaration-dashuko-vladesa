@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -38,7 +42,7 @@ namespace LogisticsGroup.Web.Controllers
             if (selectedParcels == null || selectedParcels.Length == 0)
             {
                 TempData["Error"] = "Ви не вибрали жодної посилки для рейсу!";
-                return RedirectToAction("Index", "Parcel"); // Перенаправлення на склад
+                return RedirectToAction("Index", "Parcel");
             }
 
             var parcels = await _context.Parcels
@@ -46,23 +50,23 @@ namespace LogisticsGroup.Web.Controllers
                 .Where(p => selectedParcels.Contains(p.Id))
                 .ToListAsync();
 
-            // ВИПРАВЛЕНО: Тепер шукаємо ТІЛЬКИ вільних водіїв (містить корінь "Вільн")
+            // Шукаємо вільних водіїв
             var availableDrivers = await _context.Drivers
                 .Where(d => d.Status != null && d.Status.Contains("Вільн"))
                 .ToListAsync();
             ViewBag.Drivers = new SelectList(availableDrivers, "Id", "FullName");
 
-            // Залишаємо виправлений пошук машин (розуміє довгі статуси на кшталт "Вільна (Готова до рейсу)")
+            // Шукаємо вільні машини
             var availableVehicles = await _context.Vehicles
                 .Where(v => v.Status != null && (v.Status.Contains("Вільн") || v.Status.Contains("Готов")))
                 .Select(v => new
                 {
-                    Id = v.Id,
+                    v.Id,
                     Info = $"{v.LicensePlate} ({v.Brand}, {v.Capacity} т)"
                 }).ToListAsync();
             ViewBag.Vehicles = new SelectList(availableVehicles, "Id", "Info");
 
-            // Підтягуємо шаблони маршрутів
+            // Маршрути-шаблони
             var routes = await _context.Routes.Where(r => r.Type == "Template").ToListAsync();
             ViewBag.Routes = new SelectList(routes, "Id", "Name");
 
@@ -91,6 +95,7 @@ namespace LogisticsGroup.Web.Controllers
             _context.Flights.Add(flight);
             await _context.SaveChangesAsync();
 
+            // Оновлення посилок
             var parcels = await _context.Parcels.Where(p => parcelIds.Contains(p.Id)).ToListAsync();
             foreach (var parcel in parcels)
             {
@@ -98,8 +103,8 @@ namespace LogisticsGroup.Web.Controllers
                 parcel.Status = "В дорозі";
             }
 
+            // Оновлення статусів машини та водія
             var vehicle = await _context.Vehicles.FindAsync(vehicleId);
-            // Для сумісності з твоїми випадаючими списками ставимо статус:
             if (vehicle != null) vehicle.Status = "В рейсі";
 
             var driver = await _context.Drivers.FindAsync(driverId);
@@ -109,7 +114,7 @@ namespace LogisticsGroup.Web.Controllers
 
             TempData["SuccessMessage"] = $"Рейс успішно сформовано! Номер рейсу: FLT-{flight.Id}";
 
-            return RedirectToAction("Index", "Logistician");
+            return RedirectToAction("Index");
         }
 
         // GET: Деталі рейсу
@@ -130,6 +135,30 @@ namespace LogisticsGroup.Web.Controllers
             if (flight == null) return NotFound();
 
             return View(flight);
+        }
+
+        // --- НОВИЙ МЕТОД: Очищення повідомлення про проблему (Ідея №1) ---
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResolveIssue(int id)
+        {
+            var flight = await _context.Flights.FindAsync(id);
+
+            if (flight == null)
+            {
+                return NotFound();
+            }
+
+            // Очищуємо поле з повідомленням
+            flight.IssueMessage = null;
+
+            // Зберігаємо зміни
+            _context.Update(flight);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Статус оновлено: проблему вирішено, повідомлення видалено.";
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

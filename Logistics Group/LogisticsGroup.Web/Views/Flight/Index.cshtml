@@ -3,62 +3,88 @@
     ViewData["Title"] = "Управління рейсами";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-primary fw-bold"><i class="bi bi-truck-front"></i> Активні рейси</h2>
-</div>
+<div class="container-fluid mt-4 mb-5">
+    
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong>@TempData["SuccessMessage"]</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-<div class="card shadow-sm border-0 rounded-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4">№ Рейсу</th>
-                        <th>Дата відправлення</th>
-                        <th>Транспорт</th>
-                        <th>Водій</th>
-                        <th>К-сть посилок</th>
-                        <th>Статус</th>
-                        <th>Дії</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.Any())
-                    {
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold"><i class="bi bi-truck-front"></i> Активні рейси</h2>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">№ Рейсу</th>
+                            <th>Дата відправлення</th>
+                            <th>Транспорт</th>
+                            <th>Водій</th>
+                            <th>К-сть посилок</th>
+                            <th>Статус</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
                             <tr>
                                 <td colspan="7" class="text-center py-4 text-muted">
                                     Ще не створено жодного рейсу.
                                 </td>
                             </tr>
-                    }
-                    else
-                    {
-                        @foreach (var item in Model)
-                        {
-                                    <tr>
-                                        <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
-                                        <td>@item.DepartureDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                        <td>
-                                            <i class="bi bi-truck"></i> @item.Vehicle.LicensePlate
-                                            <br /><small class="text-muted">@item.Vehicle.Brand</small>
-                                        </td>
-                                        <td>
-                                            <i class="bi bi-person-badge"></i> @item.Driver.FullName
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info text-dark rounded-pill">@item.Parcels.Count шт.</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary px-3 py-2 rounded-pill">@item.Status</span>
-                                        </td>
-                                        <td>
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary rounded-pill">Деталі</a>
-                                        </td>
-                                    </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
+                                    <td>@item.DepartureDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>
+                                        <i class="bi bi-truck"></i> @item.Vehicle.LicensePlate
+                                        <br /><small class="text-muted">@item.Vehicle.Brand</small>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-person-badge"></i> @item.Driver.FullName
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-dark rounded-pill">@item.Parcels.Count шт.</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary px-3 py-2 rounded-pill mb-1">@item.Status</span>
+                                        
+                                        @if (!string.IsNullOrEmpty(item.IssueMessage))
+                                        {
+                                            <div class="alert alert-danger p-2 mt-2 mb-0 shadow-sm position-relative" style="font-size: 0.85rem; max-width: 250px; border-left: 4px solid #dc3545;">
+                                                <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
+                                                <strong>Увага:</strong> @item.IssueMessage
+                                                
+                                                <form asp-action="ResolveIssue" asp-controller="Flight" asp-route-id="@item.Id" method="post" class="mt-2 text-end">
+                                                    <button type="submit" class="btn btn-sm btn-success rounded-pill fw-bold shadow-sm px-2 py-1" style="font-size: 0.75rem;" onclick="return confirm('Ви впевнені, що проблему вирішено?');">
+                                                        <i class="bi bi-check2-all"></i> Вирішено
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary rounded-pill">Деталі</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
