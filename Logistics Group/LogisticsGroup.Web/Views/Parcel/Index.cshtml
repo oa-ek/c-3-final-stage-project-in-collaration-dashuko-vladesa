@@ -6,17 +6,20 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="text-danger fw-bold"><i class="bi bi-box-seam"></i> Віртуальний склад</h2>
 
-    <div>
-        <form asp-action="GenerateTestData" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-outline-primary rounded-pill px-3 me-2">
-                <i class="bi bi-lightning-charge"></i> Згенерувати 10 посилок
-            </button>
-        </form>
+    @if (User.IsInRole("Logistician"))
+    {
+        <div>
+            <form asp-action="GenerateTestData" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-outline-primary rounded-pill px-3 me-2">
+                    <i class="bi bi-lightning-charge"></i> Згенерувати 10 посилок
+                </button>
+            </form>
 
-        <a asp-action="Create" class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm">
-            <i class="bi bi-plus-lg"></i> Нова посилка
-        </a>
-    </div>
+            <a asp-action="Create" class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-lg"></i> Нова посилка
+            </a>
+        </div>
+    }
 </div>
 
 <div class="card shadow-sm border-0 rounded-4 mb-4">
@@ -42,9 +45,9 @@
                 </button>
                 @if (!string.IsNullOrEmpty(Context.Request.Query["fromCityId"]) || !string.IsNullOrEmpty(Context.Request.Query["toCityId"]))
                 {
-                        <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
-                            Скинути
-                        </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
+                        Скинути
+                    </a>
                 }
             </div>
         </form>
@@ -86,10 +89,13 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4" style="width: 40px;">
-                                <input type="checkbox" class="form-check-input" id="selectAll">
-                            </th>
-                            <th>ТТН</th>
+                            @if (User.IsInRole("Logistician"))
+                            {
+                                <th class="ps-4" style="width: 40px;">
+                                    <input type="checkbox" class="form-check-input" id="selectAll">
+                                </th>
+                            }
+                            <th class="@(User.IsInRole("Logistician") ? "" : "ps-4")">ТТН</th>
                             <th>Звідки</th>
                             <th>Куди</th>
                             <th>Вага</th>
@@ -99,50 +105,58 @@
                     <tbody>
                         @if (!Model.Any())
                         {
-                                <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted">За даним маршрутом посилок не знайдено.</td>
-                                </tr>
+                            <tr>
+                                <td colspan="@(User.IsInRole("Logistician") ? "6" : "5")" class="text-center py-4 text-muted">За даним маршрутом посилок не знайдено.</td>
+                            </tr>
                         }
                         else
                         {
                             @foreach (var item in Model)
                             {
-                                        <tr>
-                                            <td class="ps-4">
-                                                <input type="checkbox" name="selectedParcels" value="@item.Id" class="form-check-input parcel-checkbox">
-                                            </td>
-                                            <td class="fw-bold">@item.Barcode</td>
-                                            <td>
-                                                <span class="text-muted small">
-                                                    <i class="bi bi-arrow-up-right text-secondary"></i> @item.SenderBranch?.City?.Name
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-info text-dark">
-                                                    <i class="bi bi-geo-alt"></i> @item.ReceiverBranch?.City?.Name
-                                                </span>
-                                            </td>
-                                            <td>@item.Weight кг</td>
-                                            <td>
-                                                <span class="badge bg-warning text-dark px-3">@item.Status</span>
-                                            </td>
-                                        </tr>
+                                <tr>
+                                    @if (User.IsInRole("Logistician"))
+                                    {
+                                        <td class="ps-4">
+                                            <input type="checkbox" name="selectedParcels" value="@item.Id" class="form-check-input parcel-checkbox">
+                                        </td>
+                                    }
+                                    <td class="fw-bold @(User.IsInRole("Logistician") ? "" : "ps-4")">@item.Barcode</td>
+                                    <td>
+                                        <span class="text-muted small">
+                                            <i class="bi bi-arrow-up-right text-secondary"></i> @item.SenderBranch?.City?.Name
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            <i class="bi bi-geo-alt"></i> @item.ReceiverBranch?.City?.Name
+                                        </span>
+                                    </td>
+                                    <td>@item.Weight кг</td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark px-3">@item.Status</span>
+                                    </td>
+                                </tr>
                             }
                         }
                     </tbody>
                 </table>
             </div>
 
-            <div class="p-3 bg-light border-top d-flex justify-content-end">
-                <button type="submit" id="createFlightBtn" class="btn btn-success fw-bold rounded-pill px-5 shadow" disabled>
-                    Сформувати рейс із вибраних (<span id="selectedCount">0</span>)
-                </button>
-            </div>
+            @if (User.IsInRole("Logistician"))
+            {
+                <div class="p-3 bg-light border-top d-flex justify-content-end">
+                    <button type="submit" id="createFlightBtn" class="btn btn-success fw-bold rounded-pill px-5 shadow" disabled>
+                        Сформувати рейс із вибраних (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+            }
         </form>
     </div>
 </div>
 
 @section Scripts {
+    @if (User.IsInRole("Logistician"))
+    {
         <script>
             const checkboxes = document.querySelectorAll('.parcel-checkbox');
             const btn = document.getElementById('createFlightBtn');
@@ -169,4 +183,5 @@
                 });
             }
         </script>
+    }
 }

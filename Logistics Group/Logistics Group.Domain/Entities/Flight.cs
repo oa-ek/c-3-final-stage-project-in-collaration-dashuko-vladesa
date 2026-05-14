@@ -13,12 +13,15 @@ namespace LogisticsGroup.Domain.Entities
         public int DriverId { get; set; }
         public Driver Driver { get; set; }
 
-        public int? RouteId { get; set; } 
+        public int? RouteId { get; set; }
         public Route Route { get; set; }
 
         public DateTime DepartureDate { get; set; }
         public DateTime? ArrivalDate { get; set; }
         public string Status { get; set; }
+
+        // НОВЕ ПОЛЕ: Для збереження повідомлень про проблеми (затори, ДТП тощо)
+        public string? IssueMessage { get; set; }
 
         public ICollection<Parcel> Parcels { get; set; }
     }

@@ -1,10 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+п»їusing Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LogisticsGroup.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using LogisticsGroup.Infrastructure.Data;
-using LogisticsGroup.Web.Services; // Підключаємо папку з сервісами API
+using LogisticsGroup.Web.Services;
 using System.Threading.Tasks;
+using System.Linq;
+using System;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -12,9 +16,8 @@ namespace LogisticsGroup.Web.Controllers
     public class DriverCabinetController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly WeatherApiService _weatherService; // 1. Додаємо сервіс погоди
+        private readonly WeatherApiService _weatherService;
 
-        // 2. Інжектимо сервіс у конструктор
         public DriverCabinetController(ApplicationDbContext context, WeatherApiService weatherService)
         {
             _context = context;
@@ -25,27 +28,69 @@ namespace LogisticsGroup.Web.Controllers
         {
             var userName = User.Identity?.Name;
 
-            var flight = await _context.Flights
+            // 1. РўСЏРіРЅРµРјРѕ Р· Р±Р°Р·Рё С– РјС–СЃС‚Рѕ РѕС‚СЂРёРјСѓРІР°С‡Р°, Р† РњР†РЎРўРћ Р’Р†Р”РџР РђР’РќРРљРђ!
+            var activeFlights = await _context.Flights
                 .Include(f => f.Vehicle)
                 .Include(f => f.Driver)
+                .Include(f => f.Route)
                 .Include(f => f.Parcels)
-                .FirstOrDefaultAsync(f => (f.Driver.FullName == userName || userName == "admin@test.com" || userName == "morchuk985.mr@novaposhta.com")
-                                          && (f.Status == "Створено" || f.Status == "В дорозі"));
+                    .ThenInclude(p => p.ReceiverBranch).ThenInclude(b => b.City)
+                .Include(f => f.Parcels)
+                    .ThenInclude(p => p.SenderBranch).ThenInclude(b => b.City) // <--- Р”РћР”РђР›Р!
+                .Where(f => f.Status == "РЎС‚РІРѕСЂРµРЅРѕ" || f.Status == "Р’ РґРѕСЂРѕР·С–")
+                .ToListAsync();
 
-            if (flight == null)
-            {
-                flight = await _context.Flights
-                    .Include(f => f.Vehicle)
-                    .Include(f => f.Driver)
-                    .Include(f => f.Parcels)
-                    .FirstOrDefaultAsync(f => f.Status == "Створено" || f.Status == "В дорозі");
-            }
+            var flight = activeFlights.FirstOrDefault(f =>
+                (f.Driver != null && GenerateDriverEmail(f.Driver.FullName) == userName) ||
+                userName == "admin@novaposhta.com" ||
+                userName == "morchuk985.mr@novaposhta.com");
 
-            // 3. ВИКЛИК ЗОВНІШНЬОГО API (Завдання лабораторної)
             if (flight != null)
             {
-                // Симулюємо координати пункту призначення (наприклад, Київ) для демонстрації API
-                var weather = await _weatherService.GetCurrentWeatherAsync(50.4501, 30.5234);
+                var cityCoordinates = new Dictionary<string, (double Lat, double Lon)>()
+                {
+                    { "РљРёС—РІ", (50.4501, 30.5234) },
+                    { "РҐР°СЂРєС–РІ", (49.9935, 36.2304) },
+                    { "РћРґРµСЃР°", (46.4825, 30.7233) },
+                    { "Р”РЅС–РїСЂРѕ", (48.4647, 35.0462) },
+                    { "Р›СЊРІС–РІ", (49.8397, 24.0297) },
+                    { "Р—Р°РїРѕСЂС–Р¶Р¶СЏ", (47.8388, 35.1396) },
+                    { "РџРѕР»С‚Р°РІР°", (49.5883, 34.5514) },
+                    { "Р§РµСЂРЅС–РІС†С–", (48.2915, 25.9352) },
+                    { "РЈР¶РіРѕСЂРѕРґ", (48.6208, 22.2879) },
+                    { "РўРµСЂРЅРѕРїС–Р»СЊ", (49.5535, 25.5948) },
+                    { "Р С–РІРЅРµ", (50.6199, 26.2516) }
+                };
+
+                // Р”РµС„РѕР»С‚РЅС– РјС–СЃС‚Р°, СЏРєС‰Рѕ С‰РѕСЃСЊ РїС–РґРµ РЅРµ С‚Р°Рє
+                string destinationCity = "РљРёС—РІ";
+                string originCity = "Р›СЊРІС–РІ";
+
+                // Р’РёС‚СЏРіСѓС”РјРѕ СЂРµР°Р»СЊРЅС– РјС–СЃС‚Р° Р· РїРµСЂС€РѕС— РїРѕСЃРёР»РєРё РІ С„СѓСЂС–
+                if (flight.Parcels != null && flight.Parcels.Any())
+                {
+                    var firstParcel = flight.Parcels.First();
+                    if (firstParcel.ReceiverBranch?.City != null)
+                        destinationCity = firstParcel.ReceiverBranch.City.Name;
+
+                    if (firstParcel.SenderBranch?.City != null)
+                        originCity = firstParcel.SenderBranch.City.Name;
+                }
+
+                double lat = 50.4501;
+                double lon = 30.5234;
+
+                if (cityCoordinates.ContainsKey(destinationCity))
+                {
+                    lat = cityCoordinates[destinationCity].Lat;
+                    lon = cityCoordinates[destinationCity].Lon;
+                }
+
+                var weather = await _weatherService.GetCurrentWeatherAsync(lat, lon);
+
+                // Р’С–РґРґР°С”РјРѕ РѕР±РёРґРІР° РјС–СЃС‚Р° РЅР° СЃС‚РѕСЂС–РЅРєСѓ
+                ViewBag.DestinationCity = destinationCity;
+                ViewBag.OriginCity = originCity;
 
                 if (weather != null)
                 {
@@ -54,7 +99,7 @@ namespace LogisticsGroup.Web.Controllers
                 }
                 else
                 {
-                    ViewBag.WeatherDesc = "Дані недоступні";
+                    ViewBag.WeatherDesc = "Р”Р°РЅС– РЅРµРґРѕСЃС‚СѓРїРЅС–";
                 }
             }
 
@@ -73,30 +118,46 @@ namespace LogisticsGroup.Web.Controllers
             if (flight != null)
             {
                 flight.Status = newStatus;
-
-                if (newStatus == "Доставлено")
+                if (newStatus == "Р”РѕСЃС‚Р°РІР»РµРЅРѕ")
                 {
-                    if (flight.Driver != null) flight.Driver.Status = "Вільний";
-                    if (flight.Vehicle != null) flight.Vehicle.Status = "Вільний";
-
-                    if (flight.Parcels != null)
-                    {
-                        foreach (var parcel in flight.Parcels) parcel.Status = "Прибуло у відділення";
-                    }
+                    if (flight.Driver != null) flight.Driver.Status = "Р’С–Р»СЊРЅРёР№";
+                    if (flight.Vehicle != null) flight.Vehicle.Status = "Р’С–Р»СЊРЅРёР№";
+                    if (flight.Parcels != null) foreach (var parcel in flight.Parcels) parcel.Status = "РџСЂРёР±СѓР»Рѕ Сѓ РІС–РґРґС–Р»РµРЅРЅСЏ";
                 }
-                else if (newStatus == "В дорозі")
+                else if (newStatus == "Р’ РґРѕСЂРѕР·С–")
                 {
-                    if (flight.Driver != null) flight.Driver.Status = "В рейсі";
-                    if (flight.Vehicle != null) flight.Vehicle.Status = "В рейсі";
-
-                    if (flight.Parcels != null)
-                    {
-                        foreach (var parcel in flight.Parcels) parcel.Status = "В дорозі";
-                    }
+                    if (flight.Driver != null) flight.Driver.Status = "Р’ СЂРµР№СЃС–";
+                    if (flight.Vehicle != null) flight.Vehicle.Status = "Р’ СЂРµР№СЃС–";
+                    if (flight.Parcels != null) foreach (var parcel in flight.Parcels) parcel.Status = "Р’ РґРѕСЂРѕР·С–";
                 }
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReportIssue(int flightId, string issueMsg)
+        {
+            var flight = await _context.Flights.FirstOrDefaultAsync(f => f.Id == flightId);
+            if (flight != null)
+            {
+                flight.IssueMessage = issueMsg;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"вљ пёЏ Р›РѕРіС–СЃС‚Р° РїРѕРІС–РґРѕРјР»РµРЅРѕ РїСЂРѕ СЃРёС‚СѓР°С†С–СЋ: \"{issueMsg}\". РћС‡С–РєСѓР№С‚Рµ РЅР° Р·РІ'СЏР·РѕРє!";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        private string GenerateDriverEmail(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName)) return "driver@logistics.com";
+            var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string lastName = parts.Length > 0 ? parts[0].ToLower() : "driver";
+            string[] ukr = { "Р°", "Р±", "РІ", "Рі", "Т‘", "Рґ", "Рµ", "С”", "Р¶", "Р·", "Рё", "С–", "С—", "Р№", "Рє", "Р»", "Рј", "РЅ", "Рѕ", "Рї", "СЂ", "СЃ", "С‚", "Сѓ", "С„", "С…", "С†", "С‡", "С€", "С‰", "СЊ", "СЋ", "СЏ", "'" };
+            string[] eng = { "a", "b", "v", "h", "g", "d", "e", "ye", "zh", "z", "y", "i", "yi", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "", "yu", "ya", "" };
+            for (int i = 0; i < ukr.Length; i++) lastName = lastName.Replace(ukr[i], eng[i]);
+            lastName = Regex.Replace(lastName, @"[^a-z0-9]", "");
+            return $"driver.{lastName}@logistics.com";
         }
     }
 }
