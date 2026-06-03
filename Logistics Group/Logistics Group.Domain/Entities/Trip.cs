@@ -16,5 +16,7 @@ namespace LogisticsGroup.Domain.Entities
 
         public int ArrivalBranchId { get; set; }
         public Branch ArrivalBranch { get; set; } = null!;
+        public int? DriverId { get; set; }
+        public Driver? Driver { get; set; }
     }
 }

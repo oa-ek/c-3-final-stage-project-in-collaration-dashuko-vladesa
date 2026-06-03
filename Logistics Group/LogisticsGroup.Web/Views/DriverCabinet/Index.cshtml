@@ -7,11 +7,11 @@
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-warning alert-dismissible fade show shadow-sm rounded-4 mb-4" role="alert" style="border-left: 5px solid #ffc107;">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            <strong>@TempData["SuccessMessage"]</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+            <div class="alert alert-warning alert-dismissible fade show shadow-sm rounded-4 mb-4" role="alert" style="border-left: 5px solid #ffc107;">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>@TempData["SuccessMessage"]</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
     }
 
     <h2 class="fw-bold mb-4 text-center" style="color: #ed3237;">
@@ -20,140 +20,154 @@
 
     @if (Model == null)
     {
-        <div class="alert alert-success text-center shadow-sm rounded-4 p-5 bg-white border-0">
-            <i class="bi bi-cup-hot fs-1 text-success d-block mb-3"></i>
-            <h4 class="fw-bold">Немає активних рейсів</h4>
-            <p class="mb-0 text-muted">Ви вільні! Очікуйте на нові призначення від логіста.</p>
-        </div>
+            <div class="alert alert-success text-center shadow-sm rounded-4 p-5 bg-white border-0">
+                <i class="bi bi-cup-hot fs-1 text-success d-block mb-3"></i>
+                <h4 class="fw-bold">Немає активних рейсів</h4>
+                <p class="mb-0 text-muted">Ви вільні! Очікуйте на нові призначення від логіста.</p>
+            </div>
     }
     else
     {
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
-            <div class="card-header text-white text-center py-3"
-                 style="background-color: @(Model.Status == "Доставлено" ? "#198754" : (Model.Status == "В дорозі" ? "#fd7e14" : "#0d6efd"));">
-                <h5 class="mb-0 fw-bold">
-                    Статус рейсу: @Model.Status
-                </h5>
-            </div>
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+                <div class="card-header text-white text-center py-3"
+                     style="background-color: @(Model.Status == "Доставлено" ? "#198754" : (Model.Status == "В дорозі" ? "#fd7e14" : "#0d6efd"));">
+                    <h5 class="mb-0 fw-bold">
+                        Статус рейсу: @Model.Status
+                    </h5>
+                </div>
 
-            <div class="card-body p-4">
+                <div class="card-body p-4">
 
-                <div class="position-relative mb-5 mt-2 text-center">
-                    <div class="progress position-absolute top-50 start-50 translate-middle w-75" style="height: 4px; z-index: 1;">
+                    <div class="position-relative mb-5 mt-2 text-center">
+                        <div class="progress position-absolute top-50 start-50 translate-middle w-75" style="height: 4px; z-index: 1;">
                         @{
                             var progress = Model.Status == "Створено" ? "0%" : Model.Status == "В дорозі" ? "50%" : "100%";
                         }
-                        <div class="progress-bar bg-success" role="progressbar" style="width: @progress;"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: @progress;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between position-relative" style="z-index: 2;">
+                            <div class="bg-white px-2 @(Model.Status != null ? "text-success fw-bold" : "text-muted")">
+                                <i class="bi bi-check-circle-fill bg-white"></i><br><small>Створено</small>
+                            </div>
+                            <div class="bg-white px-2 @(Model.Status == "В дорозі" || Model.Status == "Доставлено" ? "text-success fw-bold" : "text-muted")">
+                                <i class="bi bi-truck bg-white"></i><br><small>В дорозі</small>
+                            </div>
+                            <div class="bg-white px-2 @(Model.Status == "Доставлено" ? "text-success fw-bold" : "text-muted")">
+                                <i class="bi bi-geo-alt-fill bg-white"></i><br><small>Прибуття</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between position-relative" style="z-index: 2;">
-                        <div class="bg-white px-2 @(Model.Status != null ? "text-success fw-bold" : "text-muted")">
-                            <i class="bi bi-check-circle-fill bg-white"></i><br><small>Створено</small>
-                        </div>
-                        <div class="bg-white px-2 @(Model.Status == "В дорозі" || Model.Status == "Доставлено" ? "text-success fw-bold" : "text-muted")">
-                            <i class="bi bi-truck bg-white"></i><br><small>В дорозі</small>
-                        </div>
-                        <div class="bg-white px-2 @(Model.Status == "Доставлено" ? "text-success fw-bold" : "text-muted")">
-                            <i class="bi bi-geo-alt-fill bg-white"></i><br><small>Прибуття</small>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                    <div>
-                        <small class="text-muted d-block">Номер рейсу</small>
-                        <span class="fw-bold fs-5">FLT-@Model.Id</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <div>
+                            <small class="text-muted d-block">Номер рейсу</small>
+                            <span class="fw-bold fs-5">FLT-@Model.Id</span>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block">Відправлення</small>
+                            <span class="fw-bold">@Model.DepartureDate.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
                     </div>
-                    <div class="text-end">
-                        <small class="text-muted d-block">Відправлення</small>
-                        <span class="fw-bold">@Model.DepartureDate.ToString("dd.MM.yyyy HH:mm")</span>
-                    </div>
-                </div>
 
-                <div class="mb-4">
-                    <h6 class="text-muted mb-2"><i class="bi bi-box-seam me-2"></i> Вантаж</h6>
-                    <div class="bg-light p-3 rounded-3 fw-bold">
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2"><i class="bi bi-box-seam me-2"></i> Вантаж</h6>
+                        <div class="bg-light p-3 rounded-3 fw-bold">
                         @(Model.Parcels?.Count ?? 0) посилок на борту
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-4">
-                    <h6 class="text-muted mb-2"><i class="bi bi-car-front me-2"></i> Транспорт</h6>
-                    <div class="bg-light p-3 rounded-3 d-flex justify-content-between align-items-center">
-                        <span>@Model.Vehicle?.Brand</span>
-                        <span class="badge bg-secondary fs-6">@Model.Vehicle?.LicensePlate</span>
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2"><i class="bi bi-car-front me-2"></i> Транспорт</h6>
+                        <div class="bg-light p-3 rounded-3 d-flex justify-content-between align-items-center">
+                            <span>@Model.Vehicle?.Brand</span>
+                            <span class="badge bg-secondary fs-6">@Model.Vehicle?.LicensePlate</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-4">
-                    <h6 class="text-muted mb-2">
-                        <i class="bi bi-signpost-split-fill me-2 text-primary"></i> Маршрут рейсу:
-                        <strong class="text-dark">@(Model.Route?.Name ?? "Транзитний маршрут")</strong>
-                    </h6>
+                    <div class="mb-4 p-3 border rounded-4 bg-light shadow-sm">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-telegram text-info me-2"></i> Прив'язка до Telegram</h6>
+                        <p class="small text-muted mb-3">
+                            Він не вимагає складних переходів. Просто відкрийте пошук у Telegram, знайдіть бота 
+                            <strong class="text-primary">@("@Logistics_Control_Bot")</strong> і надішліть йому цей код авторизації:
+                        </p>
+                        <div class="text-center bg-white border rounded-3 py-2 mb-3">
+                            <span class="fs-3 fw-bolder text-success tracking-widest">@ViewBag.DriverAuthCode</span>
+                        </div>
+                        <a href="https://t.me/Logistics_Control_Bot" target="_blank" class="btn btn-outline-primary btn-sm w-100 rounded-pill fw-bold">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Відкрити бота в Telegram
+                        </a>
+                    </div>
 
-                    <p class="small text-muted mb-2">
-                        <i class="bi bi-cloud-sun me-1"></i> Погода в пункті призначення: <strong class="text-primary">@ViewBag.DestinationCity</strong>
-                    </p>
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">
+                            <i class="bi bi-signpost-split-fill me-2 text-primary"></i> Маршрут рейсу:
+                            <strong class="text-dark">@(Model.Route?.Name ?? "Транзитний маршрут")</strong>
+                        </h6>
 
-                    <div class="p-3 rounded-3 d-flex justify-content-between align-items-center text-white shadow-sm" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <p class="small text-muted mb-2">
+                            <i class="bi bi-cloud-sun me-1"></i> Погода в пункті призначення: <strong class="text-primary">@ViewBag.DestinationCity</strong>
+                        </p>
+
+                        <div class="p-3 rounded-3 d-flex justify-content-between align-items-center text-white shadow-sm" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                         @if (ViewBag.WeatherTemp != null)
                         {
-                            <div>
-                                <span class="d-block opacity-75 small">Open-Meteo API</span>
-                                <span class="fs-5 fw-bold">@ViewBag.WeatherDesc</span>
-                            </div>
-                            <h2 class="mb-0 fw-bolder">@ViewBag.WeatherTemp°C</h2>
+                                    <div>
+                                        <span class="d-block opacity-75 small">Open-Meteo API</span>
+                                        <span class="fs-5 fw-bold">@ViewBag.WeatherDesc</span>
+                                    </div>
+                                    <h2 class="mb-0 fw-bolder">@ViewBag.WeatherTemp°C</h2>
                         }
                         else
                         {
-                            <div>
-                                <span class="fs-5 fw-bold">@ViewBag.WeatherDesc 📡</span>
-                            </div>
-                            <i class="bi bi-wifi-off fs-2"></i>
+                                    <div>
+                                        <span class="fs-5 fw-bold">@ViewBag.WeatherDesc 📡</span>
+                                    </div>
+                                    <i class="bi bi-wifi-off fs-2"></i>
                         }
+                        </div>
                     </div>
-                </div>
 
                 @if (Model.Status == "В дорозі")
                 {
-                    <div class="mb-4">
-                        <a href="https://www.google.com/maps/dir/?api=1&origin=@ViewBag.OriginCity&destination=@ViewBag.DestinationCity" target="_blank" class="btn btn-outline-primary w-100 rounded-3 fw-bold mb-3 shadow-sm py-2">
-                            <i class="bi bi-geo-alt me-2"></i> Прокласти маршрут (Google Maps)
-                        </a>
+                            <div class="mb-4">
+                                <a href="https://www.google.com/maps/dir/?api=1&origin=@ViewBag.OriginCity&destination=@ViewBag.DestinationCity" target="_blank" class="btn btn-outline-primary w-100 rounded-3 fw-bold mb-3 shadow-sm py-2">
+                                    <i class="bi bi-geo-alt me-2"></i> Прокласти маршрут (Google Maps)
+                                </a>
 
-                        <div class="p-3 border rounded-3 bg-light">
-                            <label class="text-muted mb-2 fw-bold small"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Виникла проблема в дорозі?</label>
-                            <form asp-action="ReportIssue" method="post" class="d-flex gap-2">
-                                <input type="hidden" name="flightId" value="@Model.Id" />
-                                <input type="text" name="issueMsg" class="form-control form-control-sm" placeholder="Затор, ДТП, поломка..." required />
-                                <button type="submit" class="btn btn-warning btn-sm fw-bold">Відправити</button>
-                            </form>
-                        </div>
-                    </div>
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <label class="text-muted mb-2 fw-bold small"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Виникла проблема в дорозі?</label>
+                                    <form asp-action="ReportIssue" method="post" class="d-flex gap-2">
+                                        <input type="hidden" name="flightId" value="@Model.Id" />
+                                        <input type="text" name="issueMsg" class="form-control form-control-sm" placeholder="Затор, ДТП, поломка..." required />
+                                        <button type="submit" class="btn btn-warning btn-sm fw-bold">Відправити</button>
+                                    </form>
+                                </div>
+                            </div>
                 }
 
-                <div class="d-grid gap-3 mt-4">
+                    <div class="d-grid gap-3 mt-4">
                     @if (Model.Status == "Створено")
                     {
-                        <form asp-action="UpdateStatus" method="post">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <input type="hidden" name="newStatus" value="В дорозі" />
-                            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm py-3">
-                                <i class="bi bi-play-fill me-2 fs-5"></i> Виїхати (В дорозі)
-                            </button>
-                        </form>
+                                <form asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <input type="hidden" name="newStatus" value="В дорозі" />
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm py-3">
+                                        <i class="bi bi-play-fill me-2 fs-5"></i> Виїхати (В дорозі)
+                                    </button>
+                                </form>
                     }
                     else if (Model.Status == "В дорозі")
                     {
-                        <form asp-action="UpdateStatus" method="post">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <input type="hidden" name="newStatus" value="Доставлено" />
-                            <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm py-3">
-                                <i class="bi bi-check-circle-fill me-2 fs-5"></i> Прибув (Доставлено)
-                            </button>
-                        </form>
+                                <form asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <input type="hidden" name="newStatus" value="Доставлено" />
+                                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm py-3">
+                                        <i class="bi bi-check-circle-fill me-2 fs-5"></i> Прибув (Доставлено)
+                                    </button>
+                                </form>
                     }
+                    </div>
                 </div>
             </div>
-        </div>
     }
 </div>

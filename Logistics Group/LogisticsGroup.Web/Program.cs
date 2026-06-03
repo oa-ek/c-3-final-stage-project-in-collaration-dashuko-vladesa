@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
+using LogisticsGroup.Hubs;
+using LogisticsGroup.Services;
+using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,15 +68,17 @@ builder.Services.AddHttpClient<IGeocodingApiService, NominatimApiService>(client
     .HandleTransientHttpError()
     .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
-// ---- ТВОЯ ЧАСТИНА: Реєструємо сервіс погоди з Polly (Завдання 7) ----
 builder.Services.AddHttpClient<WeatherApiService>()
     .AddPolicyHandler(HttpPolicyExtensions
         .HandleTransientHttpError()
         .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
-// ----------------------------------------------------------------------
+
+builder.Services.AddSignalR();
+builder.Services.AddHostedService<TelegramBotService>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddSingleton<ITelegramBotClient>(provider => new TelegramBotClient("8871980613:AAG1vBy-HhDsEi3TIlM6_eiqkomY2QZNL5w"));
 
 var app = builder.Build();
 
@@ -104,6 +109,9 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.MapRazorPages();
+
+// ДОДАНО ДЛЯ ТЕЛЕГРАМУ ТА SIGNALR: Мапимо маршрут хабу для веб-сокетів
+app.MapHub<LocationHub>("/locationHub");
 
 using (var scope = app.Services.CreateScope())
 {
