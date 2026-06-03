@@ -9,6 +9,7 @@ using System.Linq;
 using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace LogisticsGroup.Web.Controllers
 {
@@ -26,9 +27,9 @@ namespace LogisticsGroup.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var userName = User.Identity?.Name;
+            var userName = User.Identity?.Name?.ToLower().Trim();
 
-            // 1. Тягнемо з бази і місто отримувача, І МІСТО ВІДПРАВНИКА!
+            // 1. Тягнемо з бази активні рейси
             var activeFlights = await _context.Flights
                 .Include(f => f.Vehicle)
                 .Include(f => f.Driver)
@@ -36,12 +37,13 @@ namespace LogisticsGroup.Web.Controllers
                 .Include(f => f.Parcels)
                     .ThenInclude(p => p.ReceiverBranch).ThenInclude(b => b.City)
                 .Include(f => f.Parcels)
-                    .ThenInclude(p => p.SenderBranch).ThenInclude(b => b.City) // <--- ДОДАЛИ!
+                    .ThenInclude(p => p.SenderBranch).ThenInclude(b => b.City)
                 .Where(f => f.Status == "Створено" || f.Status == "В дорозі")
                 .ToListAsync();
 
+            // 2. Гнучка перевірка водія (підтримує як старий формат, так і новий @novaposhta.com)
             var flight = activeFlights.FirstOrDefault(f =>
-                (f.Driver != null && GenerateDriverEmail(f.Driver.FullName) == userName) ||
+                (f.Driver != null && IsDriverEmailMatch(f.Driver.FullName, userName)) ||
                 userName == "admin@novaposhta.com" ||
                 userName == "morchuk985.mr@novaposhta.com");
 
@@ -62,11 +64,9 @@ namespace LogisticsGroup.Web.Controllers
                     { "Рівне", (50.6199, 26.2516) }
                 };
 
-                // Дефолтні міста, якщо щось піде не так
                 string destinationCity = "Київ";
                 string originCity = "Львів";
 
-                // Витягуємо реальні міста з першої посилки в фурі
                 if (flight.Parcels != null && flight.Parcels.Any())
                 {
                     var firstParcel = flight.Parcels.First();
@@ -88,7 +88,6 @@ namespace LogisticsGroup.Web.Controllers
 
                 var weather = await _weatherService.GetCurrentWeatherAsync(lat, lon);
 
-                // Віддаємо обидва міста на сторінку
                 ViewBag.DestinationCity = destinationCity;
                 ViewBag.OriginCity = originCity;
 
@@ -101,6 +100,13 @@ namespace LogisticsGroup.Web.Controllers
                 {
                     ViewBag.WeatherDesc = "Дані недоступні";
                 }
+
+                // Генеруємо простий унікальний код авторизації для водія (наприклад: 1000 + ID водія)
+                ViewBag.DriverAuthCode = 1000 + flight.DriverId;
+            }
+            else
+            {
+                ViewBag.DriverAuthCode = null;
             }
 
             return View(flight);
@@ -143,21 +149,35 @@ namespace LogisticsGroup.Web.Controllers
             {
                 flight.IssueMessage = issueMsg;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"⚠️ Логіста повідомлено про ситуацію: \"{issueMsg}\". Очікуйте на зв'язок!";
+                TempData["SuccessMessage"] = $"⚠️ Логіста повідомлено про 상황: \"{issueMsg}\". Очікуйте на зв'язок!";
             }
             return RedirectToAction(nameof(Index));
         }
 
-        private string GenerateDriverEmail(string fullName)
+        private bool IsDriverEmailMatch(string fullName, string userName)
         {
-            if (string.IsNullOrWhiteSpace(fullName)) return "driver@logistics.com";
+            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(userName)) return false;
+
             var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string lastName = parts.Length > 0 ? parts[0].ToLower() : "driver";
+            if (parts.Length == 0) return false;
+
+            string lastNameEng = TransliterateWord(parts[0]);
+            string firstNameEng = parts.Length > 1 ? TransliterateWord(parts[1]) : "";
+
+            string novaPoshtaFormat = $"{lastNameEng}.{firstNameEng}@novaposhta.com";
+            string legacyFormat = $"driver.{lastNameEng}@logistics.com";
+
+            return userName == novaPoshtaFormat || userName == legacyFormat;
+        }
+
+        private string TransliterateWord(string word)
+        {
+            word = word.ToLower();
             string[] ukr = { "а", "б", "в", "г", "ґ", "д", "е", "є", "ж", "з", "и", "і", "ї", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ь", "ю", "я", "'" };
             string[] eng = { "a", "b", "v", "h", "g", "d", "e", "ye", "zh", "z", "y", "i", "yi", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "", "yu", "ya", "" };
-            for (int i = 0; i < ukr.Length; i++) lastName = lastName.Replace(ukr[i], eng[i]);
-            lastName = Regex.Replace(lastName, @"[^a-z0-9]", "");
-            return $"driver.{lastName}@logistics.com";
+
+            for (int i = 0; i < ukr.Length; i++) word = word.Replace(ukr[i], eng[i]);
+            return Regex.Replace(word, @"[^a-z0-9]", "");
         }
     }
 }

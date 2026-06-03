@@ -20,7 +20,6 @@ namespace LogisticsGroup.Domain.Entities
         public DateTime? ArrivalDate { get; set; }
         public string Status { get; set; }
 
-        // НОВЕ ПОЛЕ: Для збереження повідомлень про проблеми (затори, ДТП тощо)
         public string? IssueMessage { get; set; }
 
         public ICollection<Parcel> Parcels { get; set; }

@@ -94,6 +94,7 @@
                                         <li class="nav-item">
                                                  <a class="nav-link text-dark" asp-controller="Flight" asp-action="Index">Рейси</a>
                                         </li>
+
                                             <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
         <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="Index">
             <i class="bi bi-people-fill me-1"></i> Персонал
@@ -123,6 +124,16 @@
                                                 <i class="bi bi-truck-front me-1 text-danger"></i> Активні рейси
                                             </a>
                                         </li>
+                                            <li class="nav-item">
+        <a class="nav-link text-dark fw-bold" asp-controller="Logistician" asp-action="LiveTracker">
+            <i class="bi bi-radar me-1" style="color: #ed3237;"></i> Live Радар
+        </a>
+    </li>
+        <li class="nav-item">
+        <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Logistician" asp-action="Reports">
+            <i class="bi bi-file-earmark-bar-graph text-danger me-1"></i> Аналітика та Звіти
+        </a>
+    </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Driver"))

@@ -1,0 +1,192 @@
+﻿@model LogisticsGroup.Web.Controllers.FlightsReportViewModel 
+@{
+    ViewData["Title"] = "Генерація звітів";
+}
+
+<div class="container mt-4 mb-5">
+    <!-- Шапка звіту -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1"><i class="bi bi-shield-check text-danger me-2"></i> Професійна аналітика рейсів</h2>
+            <p class="text-muted mb-0">Формування звітності для вищого керівництва та координація змін логістів</p>
+        </div>
+        <div class="btn-group">
+            <a href="?period=week" class="btn btn-outline-dark @(ViewBag.CurrentPeriod == "week" ? "active" : "")">За тиждень</a>
+            <a href="?period=month" class="btn btn-outline-dark @(ViewBag.CurrentPeriod == "month" ? "active" : "")">За місяць</a>
+        </div>
+    </div>
+
+    <!-- МЕТРИКИ ЕФЕКТИВНОСТІ (KPI) ДЛЯ КЕРІВНИЦТВА -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-dark text-white p-4 rounded-3 h-100">
+                <small class="text-white-50 fw-bold uppercase shadow-sm">📊 Рейси за період</small>
+                <h1 class="fw-bold my-2">@ViewBag.TotalFlights</h1>
+                <div class="progress bg-secondary progress-bar-striped" style="height: 6px;">
+                    <div class="progress-bar bg-danger" style="width: 100%"></div>
+                </div>
+                <small class="text-white-50 mt-2 d-block">Успішно виконано: @ViewBag.CompletedFlights | В дорозі: @ViewBag.ActiveFlights</small>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white p-4 rounded-3 h-100">
+                <small class="text-white-50 fw-bold uppercase">🎯 Відсоток успішності (Успішні/Всього)</small>
+                <h1 class="fw-bold my-2">@ViewBag.SuccessRate%</h1>
+                <div class="progress bg-white-50" style="height: 6px;">
+                    <div class="progress-bar bg-white" style="width: @ViewBag.SuccessRate%"></div>
+                </div>
+                <small class="text-white-50 mt-2 d-block">Критерій ефективності департаменту логістики</small>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-info text-dark p-4 rounded-3 h-100">
+                <small class="text-dark-50 fw-bold uppercase">⏱️ Рівень вчасності (On-Time Delivery)</small>
+                <h1 class="fw-bold my-2">@ViewBag.OnTimeRate%</h1>
+                <div class="progress bg-dark-50" style="height: 6px;">
+                    <div class="progress-bar bg-dark" style="width: @ViewBag.OnTimeRate%"></div>
+                </div>
+                <small class="text-dark-50 mt-2 d-block">Рейси, завершені без запізнень графіку</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ФІЛЬТРАЦІЯ ТА ЕКСПОРТ -->
+    <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-sliders me-2"></i> Параметри вивантаження даних</h5>
+        <form method="get" asp-action="Reports" class="row align-items-end g-3">
+            <input type="hidden" name="period" value="@ViewBag.CurrentPeriod" />
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Статус виконання</label>
+                <select name="statusFilter" class="form-select">
+                    <option value="">Всі (Успішні та проблемні)</option>
+                    <option value="Завершено" selected="@(ViewBag.CurrentStatus == "Завершено")">Тільки успішні</option>
+                    <option value="Скасовано" selected="@(ViewBag.CurrentStatus == "Скасовано")">Тільки невиконані/скасовані</option>
+                    <option value="В дорозі" selected="@(ViewBag.CurrentStatus == "В дорозі")">В дорозі</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Кастомна дата з</label>
+                <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Кастомна дата по</label>
+                <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-dark w-100"><i class="bi bi-funnel"></i> Фільтр</button>
+                <a asp-action="ExportToCsv" 
+                   asp-route-statusFilter="@ViewBag.CurrentStatus" 
+                   asp-route-startDate="@ViewBag.StartDate" 
+                   asp-route-endDate="@ViewBag.EndDate" 
+                   class="btn btn-success text-nowrap">
+                    <i class="bi bi-file-earmark-excel"></i> Сформувати Excel (CSV)
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- ГОЛОВНА ТАБЛИЦЯ: ЗВІТ ЗА ПЕРІОД -->
+    <div class="card border-0 shadow-sm rounded-3 bg-white overflow-hidden mb-5">
+        <div class="card-header bg-light py-3">
+            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-table me-2 text-primary"></i> Сводна відомість рейсів за обраний період</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Код рейсу</th>
+                        <th>Відповідальний водій</th>
+                        <th>Транспортний засіб</th>
+                        <th>Дата старту</th>
+                        <th>Статус</th>
+                        <th class="text-start">Аналіз виконання / Причина невиконання</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Flights.Any())
+                    {
+                            <tr>
+                                <td colspan="6" class="text-muted p-4">Дані за обраний період відсутні в базі.</td>
+                            </tr>
+                    }
+                    else
+                    {
+                        @foreach (var flight in Model.Flights)
+                        {
+                                    <tr>
+                                        <td class="fw-bold text-secondary">#FLT-@flight.FlightId</td>
+                                        <td class="text-start ps-4">@flight.DriverName</td>
+                                        <td>@flight.Vehicle</td>
+                                        <td>@flight.DepartureDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            <span class="badge rounded-pill px-3 py-2 
+                                        @(flight.Status == "Завершено" ? "bg-success-subtle text-success" : 
+                                          flight.Status == "В дорозі" ? "bg-warning-subtle text-warning-emphasis" : 
+                                          flight.Status == "Скасовано" ? "bg-danger-subtle text-danger" : "bg-secondary-subtle text-secondary")">
+                                        @flight.Status
+                                            </span>
+                                        </td>
+                                        <td class="text-start text-muted fs-7 italic ps-3">
+                                    @if (flight.Status == "Скасовано")
+                                    {
+                                                    <span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Не виконано: Передача зміни / Форс-мажор</span>
+                                    }
+                                    else
+                                    {
+                                                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> @flight.ReasonOrNotes</span>
+                                    }
+                                        </td>
+                                    </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- БЛОК ПЛАНУВАННЯ: ПЕРЕДАЧА ЗМІНИ НА ЗАВТРА -->
+    <div class="card border-0 shadow-sm rounded-3 bg-white overflow-hidden border-start border-4 border-warning">
+        <div class="card-header bg-warning-subtle py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-warning-emphasis"><i class="bi bi-arrow-right-square-fill me-2"></i> Передача зміни: План рейсів на завтра</h5>
+            <span class="badge bg-warning text-dark rounded-pill px-3">Всього на завтра: @ViewBag.TomorrowCount</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Код рейсів (Завтра)</th>
+                        <th>Призначений водій</th>
+                        <th>Машина</th>
+                        <th>Час виїзду</th>
+                        <th>Статус підготовки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.TomorrowPlannedFlights.Any())
+                    {
+                            <tr>
+                                <td colspan="5" class="text-muted p-4">План на завтра ще не сформовано. Логісту необхідно додати рейси.</td>
+                            </tr>
+                    }
+                    else
+                    {
+                        @foreach (var tomorrowFlight in Model.TomorrowPlannedFlights)
+                        {
+                                    <tr class="table-warning-subtle">
+                                        <td class="fw-bold text-dark">#FLT-@tomorrowFlight.FlightId</td>
+                                        <td class="text-start ps-4 fw-bold">@tomorrowFlight.DriverName</td>
+                                        <td>@tomorrowFlight.Vehicle</td>
+                                        <td>@tomorrowFlight.DepartureDate.ToString("HH:mm (dd.MM)")</td>
+                                        <td>
+                                            <span class="badge bg-dark text-white px-2 py-1">Очікує ранку</span>
+                                        </td>
+                                    </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
