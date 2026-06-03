@@ -74,16 +74,26 @@
                 <label class="form-label small fw-bold text-muted">Кастомна дата по</label>
                 <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control" />
             </div>
-            <div class="col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-dark w-100"><i class="bi bi-funnel"></i> Фільтр</button>
-                <a asp-action="ExportToCsv" 
-                   asp-route-statusFilter="@ViewBag.CurrentStatus" 
-                   asp-route-startDate="@ViewBag.StartDate" 
-                   asp-route-endDate="@ViewBag.EndDate" 
-                   class="btn btn-success text-nowrap">
-                    <i class="bi bi-file-earmark-excel"></i> Сформувати Excel (CSV)
-                </a>
-            </div>
+           <div class="col-md-4 d-flex gap-2">
+    <button type="submit" class="btn btn-dark"><i class="bi bi-funnel"></i> Фільтр</button>
+    
+    <a asp-action="ExportToCsv" 
+       asp-route-statusFilter="@ViewBag.CurrentStatus" 
+       asp-route-startDate="@ViewBag.StartDate" 
+       asp-route-endDate="@ViewBag.EndDate" 
+       class="btn btn-success text-nowrap">
+        <i class="bi bi-file-earmark-excel"></i> Excel (CSV)
+    </a>
+
+    <a asp-action="DownloadPdfReport" 
+       asp-route-period="@ViewBag.CurrentPeriod"
+       asp-route-statusFilter="@ViewBag.CurrentStatus" 
+       asp-route-startDate="@ViewBag.StartDate" 
+       asp-route-endDate="@ViewBag.EndDate" 
+       class="btn btn-danger text-nowrap fw-bold shadow-sm">
+        <i class="bi bi-file-earmark-pdf-fill"></i> Офіційний PDF
+    </a>
+</div>
         </form>
     </div>
 
