@@ -5,6 +5,21 @@
 }
 
 <div class="container-fluid py-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 rounded-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-0" style="color: #ed3237;">
@@ -89,7 +104,7 @@
                     <thead class="table-light text-muted">
                         <tr>
                             <th scope="col" class="ps-4 py-3 border-0">Номер рейсу</th>
-                            <th scope="col" class="py-3 border-0">Водій</th>
+                            <th scope="col" class="py-3 border-0">Водій та Зв'язок</th>
                             <th scope="col" class="py-3 border-0">Транспорт</th>
                             <th scope="col" class="py-3 border-0">Посилок</th>
                             <th scope="col" class="py-3 border-0">Статус</th>
@@ -101,41 +116,102 @@
                         {
                             foreach (var flight in Model)
                             {
-                                        <tr>
-                                            <td class="ps-4 py-3 fw-bold text-dark">FLT-@flight.Id</td>
-                                            <td class="py-3 fw-semibold">
-                                                <i class="bi bi-person-badge text-muted me-1"></i> @flight.Driver?.FullName
-                                            </td>
-                                            <td class="py-3">
-                                                <span class="text-primary fw-bold">@flight.Vehicle?.LicensePlate</span>
-                                            </td>
-                                            <td class="py-3 text-muted">
-                                                <i class="bi bi-box me-1"></i> @flight.Parcels?.Count шт.
-                                            </td>
-                                            <td class="py-3">
-                                                <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm">
-                                                    <i class="bi bi-play-circle me-1"></i> @flight.Status
-                                                </span>
-                                            </td>
-                                            <td class="pe-4 py-3 text-end">
-                                                <a asp-controller="Flight" asp-action="Details" asp-route-id="@flight.Id" class="btn btn-sm btn-outline-primary rounded-3 px-3 fw-bold">Деталі</a>
-                                            </td>
-                                        </tr>
+                                <tr>
+                                    <td class="ps-4 py-3 fw-bold text-dark">FLT-@flight.Id</td>
+
+                                    <td class="py-3 fw-semibold">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-person-badge text-muted me-2"></i>
+                                            <span>@flight.Driver?.FullName</span>
+                                        </div>
+                                        @if (flight.Driver != null)
+                                        {
+                                            <div class="p-2 bg-light border rounded-3 shadow-sm" style="min-width: 220px; max-width: 250px;">
+                                                <label class="small text-muted mb-1 fw-bold" style="font-size: 0.75rem;">
+                                                    <i class="bi bi-telegram text-info"></i> Написати в Telegram:
+                                                </label>
+                                                <form asp-controller="Logistician" asp-action="SendMessageToDriver" method="post" class="d-flex gap-1">
+                                                    <input type="hidden" name="driverId" value="@flight.Driver.Id" />
+                                                    <input type="text" name="message" class="form-control form-control-sm" placeholder="Ваш текст..." required />
+                                                    <button type="submit" class="btn btn-primary btn-sm px-2" title="Відправити повідомлення">
+                                                        <i class="bi bi-send-fill"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-primary fw-bold">@flight.Vehicle?.LicensePlate</span>
+                                    </td>
+                                    <td class="py-3 text-muted">
+                                        <i class="bi bi-box me-1"></i> @flight.Parcels?.Count шт.
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm">
+                                            <i class="bi bi-play-circle me-1"></i> @flight.Status
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <a asp-controller="Flight" asp-action="Details" asp-route-id="@flight.Id" class="btn btn-sm btn-outline-primary rounded-3 px-3 fw-bold">Деталі</a>
+                                    </td>
+                                </tr>
                             }
                         }
                         else
                         {
-                                <tr>
-                                    <td colspan="6" class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1 d-block mb-3 text-secondary opacity-50"></i>
-                                        <h5 class="fw-bold">Немає активних рейсів</h5>
-                                        <p class="mb-0">Натисніть "Перейти на склад", щоб сформувати перший маршрут.</p>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-3 text-secondary opacity-50"></i>
+                                    <h5 class="fw-bold">Немає активних рейсів</h5>
+                                    <p class="mb-0">Натисніть "Перейти на склад", щоб сформувати перший маршрут.</p>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+        <div id="driverMessageToast" class="toast align-items-center text-bg-primary border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="15000">
+            <div class="toast-header bg-dark text-white border-bottom-0 rounded-top">
+                <i class="bi bi-chat-dots-fill text-info me-2"></i>
+                <strong class="me-auto" id="toastDriverName">Водій</strong>
+                <small class="text-white-50">Щойно</small>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body bg-white text-dark rounded-bottom fw-bold fs-6" id="toastMessageText">
+                Тут буде текст...
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.12/signalr.min.js"></script>
+    <script>
+        // Підключаємося до нашого хабу
+        const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/locationHub")
+        .build();
+
+        // Чекаємо на подію "ReceiveDriverMessage" від Telegram-бота
+        connection.on("ReceiveDriverMessage", function (driverId, driverName, message) {
+
+        // Підставляємо ім'я та текст у віконце
+        document.getElementById("toastDriverName").innerText = driverName;
+        document.getElementById("toastMessageText").innerText = message;
+
+        // Показуємо спливаюче вікно
+        var toastEl = document.getElementById('driverMessageToast');
+        var toast = new bootstrap.Toast(toastEl);
+        toast.show();
+        });
+
+        // Запускаємо з'єднання
+        connection.start().catch(function (err) {
+        return console.error(err.toString());
+        });
+    </script>
+}

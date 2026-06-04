@@ -14,11 +14,11 @@
                             <option value="">Виберіть відділення...</option>
                             @foreach (var b in Model)
                             {
-                                    <option value="@b.Id" 
-                                            data-lat="@(b.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))" 
-                                            data-lng="@(b.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))">
-                                        №@b.Number - @b.Address (@b.City.Name)
-                                    </option>
+                                <option value="@b.Id"
+                                        data-lat="@(b.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"
+                                        data-lng="@(b.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                    №@b.Number - @b.Address (@b.City.Name)
+                                </option>
                             }
                         </select>
                     </div>
@@ -29,11 +29,11 @@
                             <option value="">Виберіть відділення...</option>
                             @foreach (var b in Model)
                             {
-                                    <option value="@b.Id" 
-                                            data-lat="@(b.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))" 
-                                            data-lng="@(b.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))">
-                                        №@b.Number - @b.Address (@b.City.Name)
-                                    </option>
+                                <option value="@b.Id"
+                                        data-lat="@(b.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))"
+                                        data-lng="@(b.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                    №@b.Number - @b.Address (@b.City.Name)
+                                </option>
                             }
                         </select>
                     </div>
@@ -72,129 +72,191 @@
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
 <style>
-    .border-dashed { border: 2px dashed #ccc !important; }
-    .border-dashed:hover { background-color: #f8f9fa; border-color: #aaa !important; }
+    .border-dashed {
+    border: 2px dashed #ccc !important;
+    }
+
+    .border-dashed:hover {
+    background-color: #f8f9fa;
+    border-color: #aaa !important;
+    }
 </style>
 
 <script>
-    // 1. Фікс зниклих іконок для маркерів у Leaflet
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
     });
 
-    // 2. Ініціалізація карти
-    var map = L.map('map').setView([48.3794, 31.1656], 6); 
+    var map = L.map('map').setView([48.3794, 31.1656], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
     var control = L.Routing.control({
-        waypoints: [],
-        routeWhileDragging: false,
-        show: false, // ховаємо панель тексту з кроками
-        fitSelectedRoutes: true, // зумування на маршрут
-        lineOptions: {
-            styles: [{ color: '#ed3237', opacity: 0.8, weight: 6 }]
-        }
+    waypoints: [],
+    routeWhileDragging: false,
+    show: false,
+    fitSelectedRoutes: true,
+    lineOptions: {
+    styles: [{ color: '#ed3237', opacity: 0.8, weight: 6 }]
+    }
     }).addTo(map);
 
     let routeData = { distance: 0, time: 0 };
 
+    function updateLabels() {
+    const stops = document.querySelectorAll('.stop-item');
+    stops.forEach((stop, index) => {
+    const label = stop.querySelector('label');
+    if (index === 0) {
+    label.innerText = 'Точка 1 (Завантаження)';
+    label.className = 'form-label fw-bold text-success';
+    } else if (index === stops.length - 1) {
+    label.innerText = `Точка ${index + 1} (Вивантаження)`;
+    label.className = 'form-label fw-bold text-danger';
+    } else {
+    label.innerText = `Точка ${index + 1} (Транзит)`;
+    label.className = 'form-label fw-bold text-warning';
+    }
+    });
+    }
+
+    function sortStopsByDistance() {
+    const container = document.getElementById('routeStops');
+    const stops = Array.from(container.querySelectorAll('.stop-item'));
+
+    if (stops.length <= 2) return;
+
+    const startStop = stops[0];
+    const endStop = stops[stops.length - 1];
+    const middleStops = stops.slice(1, stops.length - 1);
+
+    const startSelect = startStop.querySelector('select');
+    if (!startSelect.value) return;
+
+    const startOpt = startSelect.options[startSelect.selectedIndex];
+    const startLatLng = L.latLng(parseFloat(startOpt.getAttribute('data-lat')), parseFloat(startOpt.getAttribute('data-lng')));
+
+    let validStops = [];
+    let emptyStops = [];
+
+    middleStops.forEach(stop => {
+    const sel = stop.querySelector('select');
+    if (sel.value) {
+    const opt = sel.options[sel.selectedIndex];
+    const lat = parseFloat(opt.getAttribute('data-lat'));
+    const lng = parseFloat(opt.getAttribute('data-lng'));
+    if (!isNaN(lat) && !isNaN(lng)) {
+    const dist = startLatLng.distanceTo(L.latLng(lat, lng));
+    validStops.push({ node: stop, dist: dist });
+    } else {
+    emptyStops.push(stop);
+    }
+    } else {
+    emptyStops.push(stop);
+    }
+    });
+
+    validStops.sort((a, b) => a.dist - b.dist);
+
+    validStops.forEach(item => container.appendChild(item.node));
+    emptyStops.forEach(node => container.appendChild(node));
+    container.appendChild(endStop);
+
+    updateLabels();
+    }
+
     document.getElementById('addStopBtn').addEventListener('click', function() {
-        const container = document.getElementById('routeStops');
-        const stopCount = container.children.length + 1;
+    const container = document.getElementById('routeStops');
+    const stops = container.querySelectorAll('.stop-item');
 
-        const newStop = container.children[0].cloneNode(true);
-        const label = newStop.querySelector('label');
-        label.innerText = `Точка ${stopCount} (Транзит)`;
-        label.className = 'form-label fw-bold text-warning';
-        newStop.querySelector('select').value = '';
+    const newStop = stops[0].cloneNode(true);
+    newStop.querySelector('select').value = '';
 
-        const previousLastLabel = container.lastElementChild.querySelector('label');
-        previousLastLabel.innerText = `Точка ${stopCount - 1} (Транзит)`;
-        previousLastLabel.className = 'form-label fw-bold text-warning';
-
-        label.innerText = `Точка ${stopCount} (Вивантаження)`;
-        label.className = 'form-label fw-bold text-danger';
-
-        container.appendChild(newStop);
+    container.insertBefore(newStop, stops[stops.length - 1]);
+    updateLabels();
     });
 
     document.getElementById('routeStops').addEventListener('change', function(e) {
-        if(e.target.classList.contains('branch-select')) {
-            updateRoute();
-        }
+    if(e.target.classList.contains('branch-select')) {
+    updateRoute();
+    }
     });
 
     function updateRoute() {
-        const selects = document.querySelectorAll('.branch-select');
-        let coords = [];
-        let queryParams = [];
+    sortStopsByDistance();
 
-        selects.forEach(s => {
-            if (s.value) { // Тепер s.value - це ID відділення
-                let selectedOption = s.options[s.selectedIndex];
-                let lat = parseFloat(selectedOption.getAttribute('data-lat'));
-                let lng = parseFloat(selectedOption.getAttribute('data-lng'));
-                let id = s.value;
+    const selects = document.querySelectorAll('.branch-select');
+    let coords = [];
+    let queryParams = [];
 
-                if(!isNaN(lat) && !isNaN(lng)) {
-                    coords.push(L.latLng(lat, lng));
-                    queryParams.push(`branchIds=${id}`);
-                }
-            }
-        });
+    selects.forEach(s => {
+    if (s.value) {
+    let selectedOption = s.options[s.selectedIndex];
+    let lat = parseFloat(selectedOption.getAttribute('data-lat'));
+    let lng = parseFloat(selectedOption.getAttribute('data-lng'));
+    let id = s.value;
 
-        if (coords.length >= 2) {
-            control.setWaypoints(coords); // Малює червону лінію
+    if(!isNaN(lat) && !isNaN(lng)) {
+    coords.push(L.latLng(lat, lng));
+    queryParams.push(`branchIds=${id}`);
+    }
+    }
+    });
 
-            fetch(`/Logistician/CalculateRoute?${queryParams.join('&')}`)
-                .then(res => res.ok ? res.json() : Promise.reject("Помилка API"))
-                .then(data => {
-                    routeData.distance = data.distanceKm;
-                    routeData.time = data.timeHours;
+    if (coords.length >= 2) {
+    control.setWaypoints(coords);
 
-                    document.getElementById('routeInfo').classList.remove('d-none');
-                    document.getElementById('distVal').innerText = routeData.distance;
-                    document.getElementById('timeVal').innerText = routeData.time;
-                })
-                .catch(err => console.error("Помилка розрахунку:", err));
-        }
+    fetch(`/Logistician/CalculateRoute?${queryParams.join('&')}`)
+    .then(res => res.ok ? res.json() : Promise.reject("Помилка API"))
+    .then(data => {
+    routeData.distance = data.distanceKm;
+    routeData.time = data.timeHours;
+
+    document.getElementById('routeInfo').classList.remove('d-none');
+    document.getElementById('distVal').innerText = routeData.distance;
+    document.getElementById('timeVal').innerText = routeData.time;
+    })
+    .catch(err => console.error("Помилка розрахунку:", err));
+    } else {
+    control.setWaypoints([]);
+    document.getElementById('routeInfo').classList.add('d-none');
+    }
     }
 
     document.getElementById('saveTemplateBtn').addEventListener('click', function() {
-        const selects = document.querySelectorAll('.branch-select');
-        let points = [];
-        let sequence = 1;
+    const selects = document.querySelectorAll('.branch-select');
+    let points = [];
+    let sequence = 1;
 
-        selects.forEach((s, index) => {
-            if (s.value) {
-                let id = parseInt(s.value);
-                let opType = index === 0 ? "Завантаження" : (index === selects.length - 1 ? "Вивантаження" : "Транзит");
-                points.push({ BranchId: id, Sequence: sequence++, OperationType: opType });
-            }
-        });
+    selects.forEach((s, index) => {
+    if (s.value) {
+    let id = parseInt(s.value);
+    let opType = index === 0 ? "Завантаження" : (index === selects.length - 1 ? "Вивантаження" : "Транзит");
+    points.push({ BranchId: id, Sequence: sequence++, OperationType: opType });
+    }
+    });
 
-        if (points.length < 2) return alert("Потрібно вказати щонайменше 2 відділення!");
+    if (points.length < 2) return alert("Потрібно вказати щонайменше 2 відділення!");
 
-        const data = {
-            Name: document.getElementById('routeName').value || "Маршрут без назви",
-            Distance: parseFloat(routeData.distance),
-            EstimatedTime: parseInt(routeData.time),
-            Points: points
-        };
+    const data = {
+    Name: document.getElementById('routeName').value || "Маршрут без назви",
+    Distance: parseFloat(routeData.distance),
+    EstimatedTime: parseInt(routeData.time),
+    Points: points
+    };
 
-        fetch('/Logistician/SaveRouteTemplate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(res => res.json())
-        .then(result => {
-            alert(result.message);
-            window.location.reload();
-        })
-        .catch(error => alert('Помилка збереження.'));
+    fetch('/Logistician/SaveRouteTemplate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+    alert(result.message);
+    window.location.reload();
+    })
+    .catch(error => alert('Помилка збереження.'));
     });
 </script>

@@ -44,6 +44,37 @@ namespace LogisticsGroup.Web.Controllers
             return View(activeFlights);
         }
 
+        // === НОВИЙ МЕТОД: ЧАТ З ВОДІЄМ З ГОЛОВНОЇ СТОРІНКИ ===
+        [HttpPost]
+        public async Task<IActionResult> SendMessageToDriver(int driverId, string message)
+        {
+            var driver = await _context.Drivers.FindAsync(driverId);
+
+            if (driver != null && driver.TelegramChatId != 0)
+            {
+                try
+                {
+                    // Використовуємо вже налаштований _botClient
+                    await _botClient.SendMessage(
+                        chatId: driver.TelegramChatId,
+                        text: $"⚠️ *Повідомлення від логіста:*\n\n{message}",
+                        parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
+
+                    TempData["SuccessMessage"] = $"Повідомлення успішно відправлено водію {driver.FullName}!";
+                }
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "Помилка відправки: Водій заблокував бота або сталася помилка мережі.";
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Цей водій ще не підключив Telegram-бота!";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         public async Task<IActionResult> CreateRoute()
         {
             var branches = await _context.Branches.Include(b => b.City).ToListAsync();
@@ -183,7 +214,7 @@ namespace LogisticsGroup.Web.Controllers
             return File(System.Text.Encoding.GetEncoding("windows-1251").GetBytes(csvBuilder.ToString()), "text/csv", $"Flights_Report_{DateTime.Now:yyyyMMdd}.csv");
         }
 
-        // === НОВИЙ МЕТОД ДЛЯ ГЕНЕРАЦІЇ КРАСИВОГО PDF ===
+        // === МЕТОД ДЛЯ ГЕНЕРАЦІЇ КРАСИВОГО PDF ===
         [HttpGet]
         public async Task<IActionResult> DownloadPdfReport(string period = "month", string statusFilter = "", DateTime? startDate = null, DateTime? endDate = null)
         {
