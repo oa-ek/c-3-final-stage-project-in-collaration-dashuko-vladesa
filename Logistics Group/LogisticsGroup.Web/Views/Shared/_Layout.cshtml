@@ -14,41 +14,41 @@
     <link rel="stylesheet" href="~/LogisticsGroup.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-            .premium-nav {
-                background-color: rgba(255, 255, 255, 0.98) !important;
-                backdrop-filter: blur(10px);
-                border-bottom: 1px solid rgba(0,0,0,0.05);
-            }
+        .premium-nav {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
 
-                .premium-nav .nav-link {
-                    color: #495057 !important;
-                    font-weight: 500;
-                    padding: 0.5rem 1rem !important;
-                    margin: 0 0.2rem;
-                    border-radius: 8px;
-                    transition: all 0.3s ease;
-                }
+        .premium-nav .nav-link {
+        color: #495057 !important;
+        font-weight: 500;
+        padding: 0.5rem 1rem !important;
+        margin: 0 0.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        }
 
-                    .premium-nav .nav-link:hover {
-                        color: #ed3237 !important;
-                        background-color: rgba(237, 50, 55, 0.05);
-                    }
+        .premium-nav .nav-link:hover {
+        color: #ed3237 !important;
+        background-color: rgba(237, 50, 55, 0.05);
+        }
 
-            .btn-personnel {
-                color: #ed3237 !important;
-                font-weight: bold;
-                border: 2px dashed rgba(237, 50, 55, 0.3);
-                border-radius: 8px;
-            }
+        .btn-personnel {
+        color: #ed3237 !important;
+        font-weight: bold;
+        border: 2px dashed rgba(237, 50, 55, 0.3);
+        border-radius: 8px;
+        }
 
-                .btn-personnel:hover {
-                    background-color: #ed3237 !important;
-                    color: white !important;
-                    border-style: solid;
-                }
+        .btn-personnel:hover {
+        background-color: #ed3237 !important;
+        color: white !important;
+        border-style: solid;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -70,99 +70,99 @@
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                         {
-                                        <li class="nav-item">
-                                            <a class="nav-link" asp-area="" asp-controller="Driver" asp-action="Index">Водії</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" asp-area="" asp-controller="Vehicle" asp-action="Index">Транспорт</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" asp-area="" asp-controller="CargoCategory" asp-action="Index">Категорії вантажів</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" asp-area="" asp-controller="Region" asp-action="Index">Області</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" asp-area="" asp-controller="City" asp-action="Index">Міста</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
-                                        </li>
-                                        <li class="nav-item">
-                                               <a class="nav-link text-dark" asp-controller="Parcel" asp-action="Index">Посилки</a>
-                                        </li>
-                                        <li class="nav-item">
-                                                 <a class="nav-link text-dark" asp-controller="Flight" asp-action="Index">Рейси</a>
-                                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Driver" asp-action="Index">Водії</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Vehicle" asp-action="Index">Транспорт</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="CargoCategory" asp-action="Index">Категорії вантажів</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Region" asp-action="Index">Області</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="City" asp-action="Index">Міста</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Branch" asp-action="Index">Відділення</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Parcel" asp-action="Index">Посилки</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Flight" asp-action="Index">Рейси</a>
+                            </li>
 
-                                            <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-        <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="Index">
-            <i class="bi bi-people-fill me-1"></i> Персонал
-        </a>
-    </li>
-        <li class="nav-item">
-    <a class="nav-link text-danger fw-bold" asp-controller="Branch" asp-action="Map">
-        <i class="bi bi-geo-alt-fill me-1"></i> Карта
-        </a>
-    </li>
+                            <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                                <a class="nav-link btn-personnel px-3" asp-area="" asp-controller="Admin" asp-action="Index">
+                                    <i class="bi bi-people-fill me-1"></i> Персонал
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger fw-bold" asp-controller="Branch" asp-action="Map">
+                                    <i class="bi bi-geo-alt-fill me-1"></i> Карта
+                                </a>
+                            </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Logistician"))
                         {
-                                        <li class="nav-item">
-                                            <a class="nav-link fw-bold" asp-controller="Logistician" asp-action="Index">
-                                                <i class="bi bi-radar me-1 text-danger"></i> Пульт Логіста
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link fw-bold" asp-controller="Parcel" asp-action="Index">
-                                                <i class="bi bi-box-seam me-1 text-danger"></i> Віртуальний склад (Посилки)
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link fw-bold" asp-controller="Flight" asp-action="Index">
-                                                <i class="bi bi-truck-front me-1 text-danger"></i> Активні рейси
-                                            </a>
-                                        </li>
-                                            <li class="nav-item">
-        <a class="nav-link text-dark fw-bold" asp-controller="Logistician" asp-action="LiveTracker">
-            <i class="bi bi-radar me-1" style="color: #ed3237;"></i> Live Радар
-        </a>
-    </li>
-        <li class="nav-item">
-        <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Logistician" asp-action="Reports">
-            <i class="bi bi-file-earmark-bar-graph text-danger me-1"></i> Аналітика та Звіти
-        </a>
-    </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" asp-controller="Logistician" asp-action="Index">
+                                    <i class="bi bi-radar me-1 text-danger"></i> Пульт Логіста
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" asp-controller="Parcel" asp-action="Index">
+                                    <i class="bi bi-box-seam me-1 text-danger"></i> Віртуальний склад (Посилки)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" asp-controller="Flight" asp-action="Index">
+                                    <i class="bi bi-truck-front me-1 text-danger"></i> Активні рейси
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-bold" asp-controller="Logistician" asp-action="LiveTracker">
+                                    <i class="bi bi-radar me-1" style="color: #ed3237;"></i> Live Радар
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Logistician" asp-action="Reports">
+                                    <i class="bi bi-file-earmark-bar-graph text-danger me-1"></i> Аналітика та Звіти
+                                </a>
+                            </li>
                         }
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Driver"))
                         {
-                                    <li class="nav-item">
-                                        <a class="nav-link fw-bold" asp-controller="DriverCabinet" asp-action="Index">
-                                            <i class="bi bi-truck me-1 text-danger"></i> Мої Рейси
-                                        </a>
-                                    </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" asp-controller="DriverCabinet" asp-action="Index">
+                                    <i class="bi bi-truck me-1 text-danger"></i> Мої Рейси
+                                </a>
+                            </li>
                         }
                     </ul>
 
                     <ul class="navbar-nav align-items-center">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                                        <li class="nav-item me-3">
-                                            <span class="text-muted small">Привіт, <span class="fw-bold text-dark">@User.Identity?.Name</span>!</span>
-                                        </li>
-                                        <li class="nav-item">
-                                            <form id="logoutForm" class="form-inline m-0" asp-controller="Account" asp-action="Logout" method="post">
-                                                <button id="logout" type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Вийти</button>
-                                            </form>
-                                        </li>
+                            <li class="nav-item me-3">
+                                <span class="text-muted small">Привіт, <span class="fw-bold text-dark">@User.Identity?.Name</span>!</span>
+                            </li>
+                            <li class="nav-item">
+                                <form id="logoutForm" class="form-inline m-0" asp-controller="Account" asp-action="Logout" method="post">
+                                    <button id="logout" type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Вийти</button>
+                                </form>
+                            </li>
                         }
                         else
                         {
-                                        <li class="nav-item">
-                                            <a class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" asp-controller="Account" asp-action="Login">Увійти</a>
-                                        </li>
+                            <li class="nav-item">
+                                <a class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" asp-controller="Account" asp-action="Login">Увійти</a>
+                            </li>
                         }
                     </ul>
 
@@ -179,13 +179,57 @@
 
     <footer class="border-top footer text-muted bg-white py-3 mt-auto">
         <div class="container text-center">
-            &copy; 2026 - LogisticsGroup.Web 
+            &copy; 2026 - LogisticsGroup.Web
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Logistician") || User.IsInRole("Admin")))
+    {
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+            <div id="globalDriverMessageToast" class="toast align-items-center text-bg-primary border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="15000">
+                <div class="toast-header bg-dark text-white border-bottom-0 rounded-top">
+                    <i class="bi bi-chat-dots-fill text-info me-2"></i>
+                    <strong class="me-auto" id="globalToastDriverName">Водій</strong>
+                    <small class="text-white-50">Щойно (через Telegram)</small>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body bg-white text-dark rounded-bottom fw-bold fs-6" id="globalToastMessageText">
+                    Тут буде текст...
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.12/signalr.min.js"></script>
+
+        <script>
+            // Створюємо глобальне підключення, яке працює всюди
+            const globalNotificationConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/locationHub")
+            .build();
+
+            // Ловимо повідомлення
+            globalNotificationConnection.on("ReceiveDriverMessage", function (driverId, driverName, message) {
+            // Заповнюємо віконце текстом
+            document.getElementById("globalToastDriverName").innerText = driverName;
+            document.getElementById("globalToastMessageText").innerText = message;
+
+            // Показуємо віконце
+            var toastElement = document.getElementById('globalDriverMessageToast');
+            var bsToast = new bootstrap.Toast(toastElement);
+            bsToast.show();
+            });
+
+            // Запускаємо слухача
+            globalNotificationConnection.start().catch(function (err) {
+            console.error("Помилка підключення глобальних сповіщень: " + err.toString());
+            });
+        </script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -12,17 +12,17 @@
 
     @if (TempData["SuccessMessage"] != null)
     {
-                <div class="alert alert-success alert-dismissible fade show rounded-3 mb-3 shadow-sm" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-                <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-3 shadow-sm" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
 
     <div class="row">
@@ -34,54 +34,58 @@
 
                 @if (!Model.Any())
                 {
-                            <div class="alert alert-warning rounded-3 border-0 shadow-sm p-3">
-                                <i class="bi bi-info-circle-fill me-2 text-warning"></i>
-                                Зараз немає активних водіїв, які виконують рейси.
-                            </div>
+                    <div class="alert alert-warning rounded-3 border-0 shadow-sm p-3">
+                        <i class="bi bi-info-circle-fill me-2 text-warning"></i>
+                        Зараз немає активних водіїв, які виконують рейси.
+                    </div>
                 }
                 else
                 {
                     @foreach (var driver in Model)
                     {
-                                        <div class="card border rounded-3 p-3 mb-3 shadow-sm bg-light" id="driver-card-@driver.DriverId">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <div>
-                                                    <h6 class="fw-bold mb-0 text-dark">@driver.FullName</h6>
-                                                    <small class="text-muted"><i class="bi bi-telephone me-1"></i> @driver.Phone</small>
-                                                </div>
-                                                <span class="badge @(driver.FlightStatus == "В дорозі" ? "bg-orange text-white" : "bg-primary") px-2 py-1 rounded-pill small" 
-                                                      style="@(driver.FlightStatus == "В дорозі" ? "background-color: #fd7e14;" : "")">
+                        <div class="card border rounded-3 p-3 mb-3 shadow-sm bg-light" id="driver-card-@driver.DriverId">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">@driver.FullName</h6>
+                                    <small class="text-muted"><i class="bi bi-telephone me-1"></i> @driver.Phone</small>
+                                </div>
+                                <span class="badge @(driver.FlightStatus == "В дорозі" ? "bg-orange text-white" : "bg-primary") px-2 py-1 rounded-pill small"
+                                      style="@(driver.FlightStatus == "В дорозі" ? "background-color: #fd7e14;" : "")">
                                     @driver.FlightStatus
-                                                </span>
-                                            </div>
+                                </span>
+                            </div>
 
-                                            <div class="small text-muted mb-2">
-                                                <div><i class="bi bi-tag me-1"></i> Рейс: <strong>FLT-@driver.FlightId</strong></div>
-                                                <div><i class="bi bi-truck me-1"></i> Транспорт: @driver.VehicleInfo</div>
-                                            </div>
+                            <div class="small text-muted mb-2">
+                                <div><i class="bi bi-tag me-1"></i> Рейс: <strong>FLT-@driver.FlightId</strong></div>
+                                <div><i class="bi bi-truck me-1"></i> Транспорт: @driver.VehicleInfo</div>
+                            </div>
 
-                                            <div class="border-top pt-2 mt-2">
+                            <div class="border-top pt-2 mt-2">
                                 @if (driver.TelegramChatId.HasValue)
                                 {
-                                                            <form asp-action="SendTelegramMessage" method="post">
-                                                                <input type="hidden" name="chatId" value="@driver.TelegramChatId" />
-                                                                <div class="label text-muted small fw-bold mb-1"><i class="bi bi-telegram text-info"></i> Написати водію:</div>
-                                                                <div class="input-group input-group-sm">
-                                                                    <input type="text" name="messageText" class="form-control" placeholder="Повідомлення в Telegram..." required />
-                                                                    <button class="btn btn-primary" type="submit">
-                                                                        <i class="bi bi-send-fill"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </form>
+                                    <form asp-action="SendTelegramMessage" method="post">
+                                        <input type="hidden" name="chatId" value="@driver.TelegramChatId" />
+                                        <div class="label text-muted small fw-bold mb-1"><i class="bi bi-telegram text-info"></i> Написати водію:</div>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <input type="text" name="messageText" class="form-control" placeholder="Повідомлення в Telegram..." required />
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="bi bi-send-fill"></i>
+                                            </button>
+                                        </div>
+                                    </form>
                                 }
                                 else
                                 {
-                                                            <div class="text-center p-1 bg-white border rounded border-warning">
-                                                                <small class="text-warning fw-bold"><i class="bi bi-telegram"></i> Чат недоступний (ТГ не прив'язано)</small>
-                                                            </div>
+                                    <div class="text-center p-1 mb-2 bg-white border rounded border-warning">
+                                        <small class="text-warning fw-bold"><i class="bi bi-telegram"></i> Чат недоступний (ТГ не прив'язано)</small>
+                                    </div>
                                 }
-                                            </div>
-                                        </div>
+
+                                <button class="btn btn-sm btn-outline-secondary w-100 fw-bold" onclick="focusOnDriver(@driver.DriverId)">
+                                    <i class="bi bi-geo-alt-fill text-danger"></i> Знайти на карті
+                                </button>
+                            </div>
+                        </div>
                     }
                 }
             </div>
@@ -96,52 +100,86 @@
 </div>
 
 @section Scripts {
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 
-            <script>
-                // 1. Ініціалізація карти (Центр на Україну)
-                var map = L.map('map').setView([48.3794, 31.1656], 6);
+    <script>
+        var map = L.map('map').setView([49.0, 31.0], 6);
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-                // Об'єкт для зберігання маркерів водіїв на карті { driverId: marker }
-                var markers = {};
+        var warehouseIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+        });
 
-                // 2. Налаштування SignalR зв'язку для отримання геолокації в реальному часі
-                const connection = new signalR.HubConnectionBuilder()
-                    .withUrl("/locationHub") 
-                    .withAutomaticReconnect()
-                    .build();
+        var markers = {};
+        var destMarkers = {};
+        var routeLines = {};
 
-                connection.on("UpdateLocation", function (driverId, lat, lng) {
-                    console.log(`Отримано координати для водія ${driverId}: ${lat}, ${lng}`);
+        const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/locationHub")
+        .withAutomaticReconnect()
+        .build();
 
-                    // Якщо точка для цього водія вже створена — просто плавно соваємо її на нові координати
-                    if (markers[driverId]) {
-                        markers[driverId].setLatLng([lat, lng]);
-                    } else {
-                        // Якщо водій з'явився вперше — малюємо красиву червону точку
-                        markers[driverId] = L.circleMarker([lat, lng], {
-                            radius: 8,            // Розмір точки
-                            fillColor: "#ed3237",   // Яскраво-червоний колір (під стиль бренду)
-                            color: "#ffffff",       // Білий контур (щоб точку було видно на будь-яких дорогах)
-                            weight: 2,              // Товщина контуру
-                            fillOpacity: 1          // Повна непрозорість
-                        })
-                        .addTo(map)
-                        .bindPopup(`<b>Водій ID: ${driverId}</b><br><span style="color:green;">● Онлайн в дорозі</span>`);
-                    }
+        connection.on("UpdateLocation", function (driverId, lat, lng, destLat, destLng, destName) {
+        var driverLatLng = [lat, lng];
 
-                    // Фокусуємо камеру карти на новій позиції водія
-                    map.setView([lat, lng], 13);
-                });
+        if (markers[driverId]) {
+        markers[driverId].setLatLng(driverLatLng);
+        } else {
+        markers[driverId] = L.circleMarker(driverLatLng, {
+        radius: 8,
+        fillColor: "#ed3237",
+        color: "#ffffff",
+        weight: 2,
+        fillOpacity: 1
+        })
+        .addTo(map)
+        .bindPopup(`<b>Водій ID: ${driverId}</b><br><span style="color:green;">● Онлайн в дорозі</span>`);
+        }
 
-                // Запуск підключення SignalR
-                connection.start()
-                    .then(() => console.log("SignalR підключено до хабу локацій успішно!"))
-                    .catch(err => console.error("Помилка підключення SignalR: ", err.toString()));
-            </script>
+        if (destLat && destLng && destLat !== 0) {
+        var destLatLng = [destLat, destLng];
+
+        if (destMarkers[driverId]) {
+        destMarkers[driverId].setLatLng(destLatLng);
+        destMarkers[driverId].getPopup().setContent("<b style='color:#0d6efd;'>🏢 " + destName + "</b><br>Пункт призначення");
+        } else {
+        destMarkers[driverId] = L.marker(destLatLng, { icon: warehouseIcon })
+        .addTo(map)
+        .bindPopup("<b style='color:#0d6efd;'>🏢 " + destName + "</b><br>Пункт призначення");
+        }
+
+        if (routeLines[driverId]) {
+        map.removeLayer(routeLines[driverId]);
+        }
+
+        routeLines[driverId] = L.polyline([driverLatLng, destLatLng], {
+        color: '#ed3237',
+        weight: 3,
+        dashArray: '10, 10',
+        opacity: 0.6
+        }).addTo(map);
+        }
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        function focusOnDriver(driverId) {
+        if (markers[driverId]) {
+        var latLng = markers[driverId].getLatLng();
+        map.flyTo(latLng, 14, { animate: true, duration: 1.5 });
+        markers[driverId].openPopup();
+        } else {
+        alert("📍 Очікуємо на передачу геоданих від цього водія.");
+        }
+        }
+    </script>
 }
